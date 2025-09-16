@@ -17,14 +17,82 @@ export class App implements OnInit {
   protected readonly updateAvailable = signal(false);
   protected readonly installPromptEvent = signal<any>(null);
   protected readonly isInstalled = signal(false);
+  
+  // Device Detection Signals
+  protected readonly isMobile = signal(false);
+  protected readonly isAndroid = signal(false);
+  protected readonly isIOS = signal(false);
+  protected readonly deviceType = signal('Desktop');
+  protected readonly browserName = signal('Unknown');
+  protected readonly canInstallPWA = signal(false);
 
   private swUpdate = inject(SwUpdate);
 
   ngOnInit() {
+    this.detectDevice();
     this.checkServiceWorkerStatus();
     this.setupInstallPrompt();
     this.setupOnlineStatus();
     this.checkForUpdates();
+    this.checkPWADisplayMode();
+  }
+
+  private detectDevice() {
+    const userAgent = navigator.userAgent;
+    
+    // Mobile Detection
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    this.isMobile.set(isMobileDevice);
+    
+    // Android Detection
+    const isAndroidDevice = /Android/i.test(userAgent);
+    this.isAndroid.set(isAndroidDevice);
+    
+    // iOS Detection
+    const isIOSDevice = /iPhone|iPad|iPod/i.test(userAgent);
+    this.isIOS.set(isIOSDevice);
+    
+    // Device Type
+    if (isAndroidDevice) {
+      this.deviceType.set('Android Mobile');
+    } else if (isIOSDevice) {
+      this.deviceType.set('iOS Mobile');
+    } else if (isMobileDevice) {
+      this.deviceType.set('Mobile Device');
+    } else {
+      this.deviceType.set('Desktop/PC');
+    }
+    
+    // Browser Detection
+    if (userAgent.includes('Chrome')) {
+      this.browserName.set('Chrome');
+    } else if (userAgent.includes('Firefox')) {
+      this.browserName.set('Firefox');
+    } else if (userAgent.includes('Safari')) {
+      this.browserName.set('Safari');
+    } else if (userAgent.includes('Edge')) {
+      this.browserName.set('Edge');
+    } else {
+      this.browserName.set('Unknown');
+    }
+    
+    // PWA Installation Capability
+    const canInstall = (isAndroidDevice && userAgent.includes('Chrome')) || 
+                      (isIOSDevice && userAgent.includes('Safari')) ||
+                      (!isMobileDevice && (userAgent.includes('Chrome') || userAgent.includes('Edge')));
+    this.canInstallPWA.set(canInstall);
+  }
+
+  private checkPWADisplayMode() {
+    // Check if running in standalone mode (already installed)
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      this.isInstalled.set(true);
+    }
+    
+    // Check for iOS standalone mode
+    if ((window.navigator as any).standalone === true) {
+      this.isInstalled.set(true);
+    }
   }
 
   private checkServiceWorkerStatus() {
@@ -76,9 +144,42 @@ export class App implements OnInit {
       promptEvent.userChoice.then((result: any) => {
         if (result.outcome === 'accepted') {
           this.installPromptEvent.set(null);
+          this.isInstalled.set(true);
         }
       });
+    } else if (this.isIOS()) {
+      // Show iOS-specific install instructions
+      this.showIOSInstallInstructions();
     }
+  }
+
+  showIOSInstallInstructions() {
+    const message = `To install this PWA on iOS:
+    
+📱 Safari Browser:
+1. Tap the Share button (□↗)
+2. Scroll down and tap "Add to Home Screen"
+3. Tap "Add" to install
+
+🎉 The app will appear on your home screen!`;
+    
+    alert(message);
+  }
+
+  getMobileInstallInstructions(): string {
+    if (this.isAndroid()) {
+      return 'Tap "Install App" or look for the install prompt in Chrome';
+    } else if (this.isIOS()) {
+      return 'Use Safari: Share → Add to Home Screen';
+    }
+    return 'Install prompts vary by device and browser';
+  }
+
+  getDeviceIcon(): string {
+    if (this.isAndroid()) return '🤖';
+    if (this.isIOS()) return '📱';
+    if (this.isMobile()) return '📱';
+    return '💻';
   }
 
   updateApp() {
@@ -90,7 +191,10 @@ export class App implements OnInit {
   }
 
   testOfflineCapability() {
-    // This will demonstrate that the app works offline
-    alert('This demonstrates that the app continues to work offline thanks to the service worker cache!');
+    const deviceMsg = this.isMobile() ? 
+      'Turn off WiFi/Data and refresh - the app will still work!' :
+      'Go to DevTools → Network → Offline and refresh - the app will still work!';
+      
+    alert(`🔄 Testing PWA Offline Capability:\n\n${deviceMsg}\n\n✅ Service Worker is caching everything!`);
   }
 }

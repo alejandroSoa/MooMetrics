@@ -39,9 +39,10 @@ export class App implements OnInit {
 
   private detectDevice() {
     const userAgent = navigator.userAgent;
+    console.log('User Agent:', userAgent); // Debug log
     
-    // Mobile Detection
-    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    // Enhanced Mobile Detection
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(userAgent);
     this.isMobile.set(isMobileDevice);
     
     // Android Detection
@@ -52,7 +53,7 @@ export class App implements OnInit {
     const isIOSDevice = /iPhone|iPad|iPod/i.test(userAgent);
     this.isIOS.set(isIOSDevice);
     
-    // Device Type
+    // Enhanced Device Type Detection
     if (isAndroidDevice) {
       this.deviceType.set('Android Mobile');
     } else if (isIOSDevice) {
@@ -60,27 +61,48 @@ export class App implements OnInit {
     } else if (isMobileDevice) {
       this.deviceType.set('Mobile Device');
     } else {
-      this.deviceType.set('Desktop/PC');
+      // Desktop/PC Detection
+      if (/Windows/i.test(userAgent)) {
+        this.deviceType.set('Windows PC');
+      } else if (/Mac/i.test(userAgent) && !/Mobile/i.test(userAgent)) {
+        this.deviceType.set('Mac Desktop');
+      } else if (/Linux/i.test(userAgent)) {
+        this.deviceType.set('Linux PC');
+      } else {
+        this.deviceType.set('Desktop/PC');
+      }
     }
     
-    // Browser Detection
-    if (userAgent.includes('Chrome')) {
-      this.browserName.set('Chrome');
-    } else if (userAgent.includes('Firefox')) {
-      this.browserName.set('Firefox');
-    } else if (userAgent.includes('Safari')) {
+    // Enhanced Browser Detection
+    if (userAgent.includes('Edg/')) {
+      this.browserName.set('Microsoft Edge');
+    } else if (userAgent.includes('Chrome/') && !userAgent.includes('Edg/')) {
+      this.browserName.set('Google Chrome');
+    } else if (userAgent.includes('Firefox/')) {
+      this.browserName.set('Mozilla Firefox');
+    } else if (userAgent.includes('Safari/') && !userAgent.includes('Chrome/')) {
       this.browserName.set('Safari');
-    } else if (userAgent.includes('Edge')) {
-      this.browserName.set('Edge');
+    } else if (userAgent.includes('OPR/') || userAgent.includes('Opera/')) {
+      this.browserName.set('Opera');
     } else {
-      this.browserName.set('Unknown');
+      this.browserName.set('Unknown Browser');
     }
     
-    // PWA Installation Capability
-    const canInstall = (isAndroidDevice && userAgent.includes('Chrome')) || 
+    // Enhanced PWA Installation Capability
+    const canInstall = (isAndroidDevice && (userAgent.includes('Chrome') || userAgent.includes('Edg'))) || 
                       (isIOSDevice && userAgent.includes('Safari')) ||
-                      (!isMobileDevice && (userAgent.includes('Chrome') || userAgent.includes('Edge')));
+                      (!isMobileDevice && (userAgent.includes('Chrome') || userAgent.includes('Edg')));
     this.canInstallPWA.set(canInstall);
+    
+    // Debug logging
+    console.log('Device Detection Results:', {
+      isMobile: isMobileDevice,
+      isAndroid: isAndroidDevice,
+      isIOS: isIOSDevice,
+      deviceType: this.deviceType(),
+      browser: this.browserName(),
+      canInstallPWA: canInstall
+    });
   }
 
   private checkPWADisplayMode() {
@@ -177,8 +199,15 @@ export class App implements OnInit {
 
   getDeviceIcon(): string {
     if (this.isAndroid()) return '🤖';
-    if (this.isIOS()) return '📱';
+    if (this.isIOS()) return '🍎';
     if (this.isMobile()) return '📱';
+    
+    // Desktop/PC specific icons
+    const deviceType = this.deviceType();
+    if (deviceType.includes('Windows')) return '🖥️';
+    if (deviceType.includes('Mac')) return '🖥️';
+    if (deviceType.includes('Linux')) return '🐧';
+    
     return '💻';
   }
 

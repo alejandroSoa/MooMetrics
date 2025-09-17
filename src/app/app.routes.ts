@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { Home } from './home/home';
-import { SwTest } from './sw-test/sw-test';
+import { HomeComponent } from './components/home/home.component';
+import { SwTestComponent } from './components/sw-test/sw-test.component';
 
 export const routes: Routes = [
-  { path: '', component: Home },
-  { path: 'sw/test', component: SwTest },
-  { path: '**', redirectTo: '' } // Wildcard route para rutas no encontradas
+  { path: '', component: HomeComponent },
+  { path: 'sw/test', component: SwTestComponent },
+  { path: '**', redirectTo: '' }
 ];

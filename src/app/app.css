@@ -1,17 +1,1 @@
-/* Global App Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  min-height: 100vh;
-}
-
-/* Router Outlet Container */
-router-outlet {
-  display: block;
-}
+/* Styles moved to sw-test.component.css */

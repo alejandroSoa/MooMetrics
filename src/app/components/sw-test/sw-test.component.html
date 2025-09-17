@@ -1,0 +1,137 @@
+<div class="pwa-demo-container">
+  <header class="header">
+    <h1>MooMetrics PWA Demo</h1>
+    
+    <div class="device-info">
+      <span class="device-badge" [class.mobile-indicator]="deviceInfo.isMobile">
+        📱 {{ deviceInfo.platform }}
+      </span>
+      <span class="browser-badge">🌐 {{ deviceInfo.browser }}</span>
+    </div>
+
+    <div class="status-indicators">
+      <span class="status-badge" [class.online]="isOnline" [class.offline]="!isOnline">
+        {{ isOnline ? '🟢 Online' : '🔴 Offline' }}
+      </span>
+      <span class="status-badge enabled" *ngIf="hasServiceWorker">
+        ⚙️ Service Worker Ready
+      </span>
+      <span class="status-badge enabled" *ngIf="isInstalled">
+        📲 App Installed
+      </span>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section class="pwa-section">
+      <h2>📱 Installation</h2>
+      
+      <div class="installation-card">
+        <div *ngIf="isInstalled" class="success-message">
+          <strong>✅ App is installed!</strong>
+          <div class="install-details">
+            You can now use this app offline and access it from your home screen.
+          </div>
+        </div>
+
+        <div *ngIf="canInstall && !isInstalled" class="install-prompt">
+          <p>📲 Ready to install this app!</p>
+          <button class="install-btn" (click)="installApp()">
+            Install MooMetrics
+          </button>
+        </div>
+
+        <div *ngIf="!canInstall && !isInstalled" class="info-message">
+          <strong>ℹ️ Installation not available</strong>
+          <div class="install-details">
+            This may be because the app is already installed or your browser doesn't support PWA installation.
+          </div>
+        </div>
+
+        <div *ngIf="deviceInfo.isIOS && !isInstalled" class="ios-install-prompt">
+          <strong>📱 iOS Installation</strong>
+          <div class="ios-install-tip">
+            To install on iOS: Tap the Share button in Safari, then select "Add to Home Screen"
+          </div>
+        </div>
+
+        <div *ngIf="deviceInfo.isAndroid && !canInstall && !isInstalled" class="mobile-install-tip">
+          <strong>🤖 Android Installation</strong><br>
+          Look for the "Add to Home Screen" option in your browser menu, or an install banner should appear automatically.
+        </div>
+      </div>
+    </section>
+
+    <section class="pwa-section">
+      <h2>⚙️ Service Worker Status</h2>
+      
+      <div class="sw-status-card">
+        <div class="info-grid">
+          <div class="info-item" [class.android-specific]="deviceInfo.isAndroid" [class.ios-specific]="deviceInfo.isIOS">
+            <strong>Service Worker:</strong> {{ hasServiceWorker ? '✅ Supported' : '❌ Not Supported' }}
+          </div>
+          <div class="info-item">
+            <strong>Registration:</strong> {{ swRegistration ? '✅ Active' : '⏳ Pending' }}
+          </div>
+          <div class="info-item">
+            <strong>Network Status:</strong> {{ isOnline ? '🟢 Online' : '🔴 Offline' }}
+          </div>
+          <div class="info-item">
+            <strong>Install Status:</strong> {{ isInstalled ? '📲 Installed' : '⏳ Available' }}
+          </div>
+        </div>
+
+        <div *ngIf="hasUpdate" class="update-prompt">
+          <p>🔄 App update available!</p>
+          <button class="update-btn">Update Now</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="pwa-section">
+      <h2>🚀 PWA Features</h2>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>📱 Installable</h3>
+          <p>Add to home screen for native app experience</p>
+        </div>
+        <div class="feature-card">
+          <h3>⚡ Fast Loading</h3>
+          <p>Service Worker caching for instant load times</p>
+        </div>
+        <div class="feature-card">
+          <h3>🔄 Auto Updates</h3>
+          <p>Seamless background updates</p>
+        </div>
+        <div class="feature-card">
+          <h3>📡 Offline Ready</h3>
+          <p>Works without internet connection</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="pwa-section">
+      <h2>🧪 Offline Demo</h2>
+      
+      <div class="offline-demo-card">
+        <div class="info-message">
+          <strong>Test Offline Functionality:</strong>
+          <ol>
+            <li>Open your browser's developer tools (F12)</li>
+            <li>Go to the Network tab</li>
+            <li>Check "Offline" to simulate no internet</li>
+            <li>Reload the page - it should still work!</li>
+            <li>Click the test button below</li>
+          </ol>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+          <button class="test-btn" (click)="testOfflineFeature()">
+            🧪 Test Offline Feature
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

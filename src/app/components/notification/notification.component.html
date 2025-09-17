@@ -1,0 +1,11 @@
+<div class="notification-container">
+  <h2>Stable Notifications</h2>
+  <ul>
+    <li *ngFor="let n of notifications" [class]="n.type">
+      <span class="date">{{ n.date | date:'MMM dd, yyyy HH:mm' }}</span>
+      <span class="type">{{ n.type | titlecase }}</span>
+      <span class="message">{{ n.message }}</span>
+      <div class="type-indicator"></div>
+    </li>
+  </ul>
+</div>

@@ -1,2 +1,35 @@
-<!-- Angular Router Container -->
-<router-outlet></router-outlet>
+<div class="app-container">
+  <!-- Left Sidebar -->
+  <div class="sidebar">
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-icon">
+        <span>MO</span>
+        <span>ME</span>
+      </div>
+    </div>
+    
+    <!-- Navigation Icons -->
+    <div class="nav-icons">
+
+      <div class="nav-icon-container">
+        <div class="nav-active-indicator" *ngIf="isActive('/home')"></div>
+        <a class="nav-icon" [routerLink]="['/home']" style="cursor:pointer; text-decoration: none;">
+          <fa-icon [icon]="faUsers"></fa-icon>
+        </a>
+      </div>
+
+      <div class="nav-icon-container">
+        <div class="nav-active-indicator" *ngIf="isActive('/notifications/test')"></div>
+        <a class="nav-icon" [routerLink]="['/notifications/test']" style="cursor:pointer; text-decoration: none;">
+          <fa-icon [icon]="faBell"></fa-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="main-content">
+      <router-outlet></router-outlet>
+  </div>
+</div>

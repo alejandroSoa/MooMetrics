@@ -1,1 +1,113 @@
-/* Styles moved to sw-test.component.css */
+.app-container {
+  display: flex;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Left Sidebar */
+.sidebar {
+  width: 60px;
+  background-color: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.logo {
+  margin-bottom: 30px;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #fff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 10px;
+  color: #000;
+  line-height: 1;
+}
+
+.nav-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.nav-icon-container {
+  display: flex;
+  align-items: center;
+  height: 40px; 
+}
+
+.nav-active-indicator {
+  width: 2px;
+  height: 12px; 
+  background: #fff;
+  border-radius: 2px;
+  margin-right: 5px; 
+  margin-left: 0; 
+  visibility: visible; 
+}
+
+.nav-icon {
+  width: 32px;
+  height: 32px;
+  background-color: #333;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px; /* Ensure icon size is visible */
+}
+
+.nav-icon:hover {
+  background-color: #444;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto; /* Enable scrolling within the main-content container */
+  min-width: 0; /* Permitir shrink en móviles */
+}
+
+/* Remove overflow from other classes */
+.content-area {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: hidden; /* Prevent scrolling outside main-content */
+}
+
+.stables-sidebar {
+  width: 250px;
+  background-color: #fff;
+  border-right: 1px solid #ddd;
+  padding: 20px 0;
+  min-width: 250px;
+  flex-shrink: 0;
+  overflow: hidden; /* Remove scrolling from sidebar */
+}
+
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  min-width: 0; /* Cambiado de 400px a 0 para permitir shrink en móviles */
+  flex-shrink: 1;
+  overflow: hidden; /* Remove scrolling from chat area */
+}
+

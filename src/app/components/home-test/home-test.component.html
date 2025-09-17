@@ -1,0 +1,76 @@
+<div class="header">
+  <button *ngIf="showChat" class="back-button mobile-only" (click)="backToChannels()" aria-label="Back">
+    <fa-icon [icon]="faArrowLeft"></fa-icon>
+  </button>
+  <h1>MooMetrics</h1>
+</div>
+
+<!-- Content Area -->
+<div class="content-area">
+  <!-- Stables Sidebar -->
+  <div class="stables-sidebar" [class.mobile-hidden]="showChat">
+    <h3>Available Stables</h3>
+    
+    <!-- Stable Items -->
+    <div class="stable-list">
+      <div *ngFor="let stable of stables; let i = index" class="stable-item">
+        <div class="stable-header" (click)="toggleStable(i)">
+          <span class="stable-name">{{ stable.name }}</span>
+          <span class="toggle-icon" [class.expanded]="stable.isExpanded">
+            {{ stable.isExpanded ? '▼' : '▶' }}
+          </span>
+        </div>
+        
+        <!-- Channels (show when expanded) -->
+        <div *ngIf="stable.isExpanded" class="sub-items">
+          <div 
+            *ngFor="let channel of stable.channels; let j = index" 
+            class="sub-item"
+            [class.active]="channel.isActive"
+            (click)="selectChannel(i, j)">
+            {{ channel.name }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Chat Area -->
+  <div class="chat-area" [class.mobile-hidden]="!showChat">
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <h2>Chat with AI</h2>
+    </div>
+    
+    <!-- Chat Messages -->
+    <div class="chat-messages">
+      <div *ngFor="let message of currentChatMessages" class="message" [class.bot-message]="message.isBot">
+        <div class="message-avatar">
+          <div class="avatar-circle">
+            {{ message.user.charAt(0) }}
+          </div>
+        </div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="username">{{ message.user }}</span>
+            <span class="timestamp">{{ message.time }}</span>
+          </div>
+          <div class="message-text">{{ message.message }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Message Input -->
+    <div class="message-input-container">
+      <input 
+        type="text" 
+        placeholder="Type your message here..." 
+        [(ngModel)]="messageInput"
+        (keyup.enter)="sendMessage()"
+        class="message-input">
+      <button (click)="sendMessage()" class="send-button">
+        <img src="assets/images/send-button-icon.png" alt="Send" style="width:25px;height:25px;" />
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,19 +1,24 @@
+/* App Container - Persistent Sidebar Layout */
 .app-container {
   display: flex;
   height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Roboto', sans-serif;
+  overflow: hidden;
 }
 
-/* Left Sidebar */
-.sidebar {
+/* Persistent Sidebar */
+.persistent-sidebar {
   width: 60px;
+  min-width: 60px;
   background-color: #000;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px 0;
+  flex-shrink: 0;
 }
 
+/* Logo */
 .logo {
   margin-bottom: 30px;
 }
@@ -33,6 +38,7 @@
   line-height: 1;
 }
 
+/* Navigation Icons */
 .nav-icons {
   display: flex;
   flex-direction: column;
@@ -42,18 +48,51 @@
 .nav-icon-container {
   display: flex;
   align-items: center;
-  height: 40px; 
+  height: 40px;
+  width: 100%;
+  justify-content: center;
 }
 
 .nav-active-indicator {
   width: 2px;
-  height: 12px; 
+  height: 12px;
   background: #fff;
   border-radius: 2px;
-  margin-right: 5px; 
-  margin-left: 0; 
-  visibility: visible; 
+  margin-right: 5px;
+  margin-left: 0;
+  visibility: visible;
 }
+
+.nav-icon {
+  width: 32px;
+  height: 32px;
+  background-color: #333;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  text-decoration: none;
+}
+
+.nav-icon:hover {
+  background-color: #444;
+}
+
+/* Main Content Area */
+.main-content-area {
+  flex: 1;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Remove old duplicate styles - they are already defined above */
 
 .nav-icon {
   width: 32px;
@@ -72,15 +111,40 @@
   background-color: #444;
 }
 
-/* Main Content */
-.main-content {
+/* Main Content - now managed by Ionic */
+#main-content {
   flex: 1;
-  background-color: #f5f5f5;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: auto; /* Enable scrolling within the main-content container */
-  min-width: 0; /* Permitir shrink en móviles */
+  height: 100vh;
+}
+
+ion-header ion-toolbar {
+  --background: #fff;
+  --color: #000;
+  font-family: 'Roboto', sans-serif !important;
+}
+
+ion-header ion-title {
+  font-family: 'Roboto', sans-serif !important;
+  font-weight: 500;
+}
+
+.custom-title {
+  font-family: 'Roboto', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 20px !important;
+}
+
+ion-content {
+  --background: #f5f5f5;
+  --padding: 0;
+}
+
+.main-content {
+  position: relative; /* Allow absolute positioning of children */
+  height: 95%;
+  overflow: hidden;
+  min-width: 0;
+  padding: 0;
 }
 
 /* Remove overflow from other classes */

@@ -4,8 +4,21 @@ import { HomeTestComponent } from './components/home-test/home-test.component';
 import { NotificationComponent } from './components/notification/notification.component';
 
 export const routes: Routes = [
-  { path: 'home', component: HomeTestComponent },
-  { path: 'sw/test', component: SwTestComponent },
-  { path: 'notifications/test', component: NotificationComponent },
-  { path: '**', redirectTo: 'home' }
+  { 
+    path: '', 
+    redirectTo: 'home', 
+    pathMatch: 'full' 
+  },
+  { 
+    path: 'home', 
+    component: HomeTestComponent
+  },
+  { 
+    path: 'notifications', 
+    component: NotificationComponent
+  },
+  { 
+    path: 'sw-test', 
+    component: SwTestComponent
+  }
 ];

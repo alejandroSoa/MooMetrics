@@ -1,0 +1,85 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="custom-title">Iniciar Sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="auth-container">
+    <div class="auth-card">
+      <!-- Logo Section -->
+      <div class="auth-logo">
+        <div class="logo-icon">
+          <span>MO</span>
+          <span>ME</span>
+        </div>
+        <h1>MooMetrics</h1>
+        <p>Bienvenido de nuevo</p>
+      </div>
+
+      <!-- Login Form -->
+      <form class="auth-form" (ngSubmit)="onLogin()">
+        <!-- Email Input -->
+        <ion-item class="auth-input">
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input 
+            type="email" 
+            [(ngModel)]="email" 
+            name="email"
+            placeholder="tu@email.com"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <!-- Password Input -->
+        <ion-item class="auth-input">
+          <ion-label position="stacked">Contraseña</ion-label>
+          <ion-input 
+            [type]="showPassword ? 'text' : 'password'" 
+            [(ngModel)]="password" 
+            name="password"
+            placeholder="Tu contraseña"
+            required>
+          </ion-input>
+          <ion-button 
+            fill="clear" 
+            slot="end" 
+            class="password-toggle"
+            (click)="togglePasswordVisibility()">
+            <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <!-- Forgot Password Link -->
+        <div class="forgot-password">
+          <ion-button fill="clear" size="small">
+            ¿Olvidaste tu contraseña?
+          </ion-button>
+        </div>
+
+        <!-- Login Button -->
+        <ion-button 
+          expand="block" 
+          class="auth-button login-button" 
+          type="submit"
+          [disabled]="!email || !password">
+          Iniciar Sesión
+        </ion-button>
+
+        <!-- Divider -->
+        <div class="divider">
+          <span>o</span>
+        </div>
+
+        <!-- Register Link -->
+        <div class="auth-switch">
+          <p>¿No tienes cuenta? 
+            <ion-button fill="clear" size="small" (click)="navigateToRegister()">
+              Regístrate aquí
+            </ion-button>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</ion-content>

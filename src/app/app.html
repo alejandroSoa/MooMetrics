@@ -1,5 +1,11 @@
 <ion-app>
-  <div class="app-container">
+  <!-- Auth Pages - Full Screen -->
+  <div *ngIf="isAuthPage()" class="auth-layout">
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Main App Layout - With Sidebar -->
+  <div *ngIf="!isAuthPage()" class="app-container">
     <!-- Persistent Sidebar -->
     <div class="persistent-sidebar">
       <!-- Logo -->

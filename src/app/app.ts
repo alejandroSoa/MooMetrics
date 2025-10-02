@@ -36,4 +36,9 @@ export class App implements OnInit {
     const current = this.currentUrl();
     return current === path || current.startsWith(path + '/');
   }
+
+  isAuthPage(): boolean {
+    const current = this.currentUrl();
+    return current === '/login' || current === '/register';
+  }
 }

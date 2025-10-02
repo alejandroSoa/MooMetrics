@@ -1,0 +1,130 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="custom-title">Crear Cuenta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="auth-container">
+    <div class="auth-card">
+      <!-- Logo Section -->
+      <div class="auth-logo">
+        <div class="logo-icon">
+          <span>MO</span>
+          <span>ME</span>
+        </div>
+        <h1>MooMetrics</h1>
+        <p>Únete a nuestra comunidad</p>
+      </div>
+
+      <!-- Register Form -->
+      <form class="auth-form" (ngSubmit)="onRegister()">
+        <!-- Name Fields Row -->
+        <div class="name-row">
+          <ion-item class="auth-input name-input">
+            <ion-label position="stacked">Nombre</ion-label>
+            <ion-input 
+              type="text" 
+              [(ngModel)]="formData.firstName" 
+              name="firstName"
+              placeholder="Tu nombre"
+              required>
+            </ion-input>
+          </ion-item>
+
+          <ion-item class="auth-input name-input">
+            <ion-label position="stacked">Apellido</ion-label>
+            <ion-input 
+              type="text" 
+              [(ngModel)]="formData.lastName" 
+              name="lastName"
+              placeholder="Tu apellido"
+              required>
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <!-- Email Input -->
+        <ion-item class="auth-input">
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input 
+            type="email" 
+            [(ngModel)]="formData.email" 
+            name="email"
+            placeholder="tu@email.com"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <!-- Password Input -->
+        <ion-item class="auth-input">
+          <ion-label position="stacked">Contraseña</ion-label>
+          <ion-input 
+            [type]="showPassword ? 'text' : 'password'" 
+            [(ngModel)]="formData.password" 
+            name="password"
+            placeholder="Mínimo 8 caracteres"
+            required>
+          </ion-input>
+          <ion-button 
+            fill="clear" 
+            slot="end" 
+            class="password-toggle"
+            (click)="togglePasswordVisibility()">
+            <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <!-- Confirm Password Input -->
+        <ion-item class="auth-input">
+          <ion-label position="stacked">Confirmar Contraseña</ion-label>
+          <ion-input 
+            [type]="showConfirmPassword ? 'text' : 'password'" 
+            [(ngModel)]="formData.confirmPassword" 
+            name="confirmPassword"
+            placeholder="Repite tu contraseña"
+            required>
+          </ion-input>
+          <ion-button 
+            fill="clear" 
+            slot="end" 
+            class="password-toggle"
+            (click)="toggleConfirmPasswordVisibility()">
+            <ion-icon [name]="showConfirmPassword ? 'eye-off' : 'eye'"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <!-- Password Match Indicator -->
+        <div class="password-match" *ngIf="formData.password && formData.confirmPassword">
+          <div [class]="formData.password === formData.confirmPassword ? 'match-success' : 'match-error'">
+            <ion-icon [name]="formData.password === formData.confirmPassword ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+            <span>{{ formData.password === formData.confirmPassword ? 'Las contraseñas coinciden' : 'Las contraseñas no coinciden' }}</span>
+          </div>
+        </div>
+
+        <!-- Register Button -->
+        <ion-button 
+          expand="block" 
+          class="auth-button register-button" 
+          type="submit"
+          [disabled]="!isFormValid()">
+          Crear Cuenta
+        </ion-button>
+
+        <!-- Divider -->
+        <div class="divider">
+          <span>o</span>
+        </div>
+
+        <!-- Login Link -->
+        <div class="auth-switch">
+          <p>¿Ya tienes cuenta? 
+            <ion-button fill="clear" size="small" (click)="navigateToLogin()">
+              Inicia sesión aquí
+            </ion-button>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</ion-content>

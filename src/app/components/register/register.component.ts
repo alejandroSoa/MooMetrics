@@ -92,11 +92,24 @@ export class RegisterComponent {
   }
 
   isFormValid(): boolean {
-    return !!this.formData.firstName && 
-           !!this.formData.lastName && 
-           !!this.formData.email && 
-           !!this.formData.password && 
-           !!this.formData.confirmPassword &&
-           this.formData.password === this.formData.confirmPassword;
+    const isValid = !!this.formData.firstName?.trim() && 
+                   !!this.formData.lastName?.trim() && 
+                   !!this.formData.email?.trim() && 
+                   !!this.formData.password?.trim() && 
+                   !!this.formData.confirmPassword?.trim() &&
+                   this.formData.password === this.formData.confirmPassword;
+    
+    // Debug logging to help identify the issue
+    console.log('Form validation check:', {
+      firstName: !!this.formData.firstName?.trim(),
+      lastName: !!this.formData.lastName?.trim(),
+      email: !!this.formData.email?.trim(),
+      password: !!this.formData.password?.trim(),
+      confirmPassword: !!this.formData.confirmPassword?.trim(),
+      passwordsMatch: this.formData.password === this.formData.confirmPassword,
+      isValid: isValid
+    });
+    
+    return isValid;
   }
 }

@@ -5,8 +5,9 @@ import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faUsers, faBell, faSearch } from '@fortawesome/free-solid-svg-icons';
-import { IonApp } from '@ionic/angular/standalone';
+import { faUsers, faBell, faSearch, faUserShield, faToggleOn, faToggleOff, faChartLine, faUserTag } from '@fortawesome/free-solid-svg-icons';
+import { IonApp, IonToggle } from '@ionic/angular/standalone';
+import { AdminModeService } from './services/admin-mode.service';
 
 @Component({
   selector: 'app-root',
@@ -18,9 +19,15 @@ export class App implements OnInit {
   title = 'MooMetrics';
   faUsers = faUsers;
   faBell = faBell;
+  faUserShield = faUserShield;
+  faToggleOn = faToggleOn;
+  faToggleOff = faToggleOff;
+  faChartLine = faChartLine;
+  faUserTag = faUserTag;
   currentUrl = signal('');
+  isAdminMode = signal(false);
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private adminModeService: AdminModeService) {}
 
   ngOnInit() {
     this.currentUrl.set(this.router.url);
@@ -30,6 +37,11 @@ export class App implements OnInit {
     ).subscribe((event: NavigationEnd) => {
       this.currentUrl.set(event.url);
     });
+
+    // Subscribe to admin mode changes
+    this.adminModeService.getAdminModeStatus().subscribe(isAdmin => {
+      this.isAdminMode.set(isAdmin);
+    });
   }
 
   isActive(path: string): boolean {
@@ -37,8 +49,17 @@ export class App implements OnInit {
     return current === path || current.startsWith(path + '/');
   }
 
+  isExactActive(path: string): boolean {
+    const current = this.currentUrl();
+    return current === path;
+  }
+
   isAuthPage(): boolean {
     const current = this.currentUrl();
     return current === '/login' || current === '/register';
+  }
+
+  toggleAdminMode(): void {
+    this.adminModeService.toggleAdminMode();
   }
 }

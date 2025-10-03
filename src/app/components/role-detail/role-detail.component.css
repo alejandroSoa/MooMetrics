@@ -1,0 +1,209 @@
+.role-detail-container {
+  padding: 20px;
+  height: 100%;
+  background-color: #f5f5f5;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50%;
+  gap: 20px;
+}
+
+.loading-container p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50%;
+  padding: 20px;
+  gap: 20px;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #f44336;
+  font-size: 1.1rem;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.success-message {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 20px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.role-detail-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.role-edit-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.role-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.role-id {
+  font-size: 0.9rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+}
+
+.role-admin {
+  background-color: #e74c3c;
+}
+
+.role-dev {
+  background-color: #3498db;
+}
+
+.role-user {
+  background-color: #2ecc71;
+}
+
+.role-default {
+  background-color: #95a5a6;
+}
+
+.role-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-item {
+  --background: #fafafa;
+  --border-radius: 8px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  margin-bottom: 16px;
+}
+
+.form-item ion-label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-item ion-input,
+.form-item ion-textarea {
+  --background: #fff;
+  --color: #333;
+  --placeholder-color: #999;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.form-item ion-input:focus-within,
+.form-item ion-textarea:focus-within {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.save-button {
+  --background: #000;
+  --background-hover: #333;
+  --color: #fff;
+  --border-radius: 8px;
+  font-weight: 600;
+}
+
+.save-button:disabled {
+  --background: #cccccc;
+  --color: #666;
+}
+
+.cancel-button {
+  --border-color: #6c757d;
+  --color: #6c757d;
+  --border-radius: 8px;
+  font-weight: 600;
+}
+
+.cancel-button:disabled {
+  --border-color: #cccccc;
+  --color: #999;
+}
+
+.back-button {
+  --color: #6c757d;
+  --border-radius: 8px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.back-button:disabled {
+  --color: #999;
+}
+
+.custom-title {
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .role-detail-container {
+    padding: 10px;
+  }
+  
+  .role-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .button-group {
+    gap: 8px;
+  }
+}
+
+/* Loading spinner styling */
+ion-spinner {
+  --color: #007bff;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}

@@ -62,8 +62,8 @@
           expand="block" 
           class="auth-button login-button" 
           type="submit"
-          [disabled]="!email || !password">
-          Iniciar Sesión
+          [disabled]="!isFormValid() || isLoading">
+          {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
         </ion-button>
 
         <!-- Divider -->

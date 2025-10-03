@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { 
   IonHeader, 
   IonToolbar, 
@@ -37,13 +38,40 @@ export class LoginComponent {
   email: string = '';
   password: string = '';
   showPassword: boolean = false;
+  isLoading: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   onLogin() {
-    // Por ahora solo navegamos al home, aquí irá la lógica de autenticación
-    console.log('Login attempt:', { email: this.email, password: this.password });
-    this.router.navigate(['/home']);
+    if (!this.email || !this.password) {
+      console.error('Email y contraseña son requeridos');
+      return;
+    }
+
+    this.isLoading = true;
+    
+    const credentials = {
+      email: this.email,
+      password: this.password
+    };
+
+    console.log('Login attempt:', credentials);
+    
+    this.authService.login(credentials).subscribe({
+      next: (response) => {
+        console.log('Login successful:', response);
+        if (response.status === 'success') {
+          // Navigate to home after successful login
+          this.router.navigate(['/home']);
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Login failed:', error);
+        this.isLoading = false;
+        // Here you can add user-friendly error handling
+      }
+    });
   }
 
   togglePasswordVisibility() {
@@ -52,5 +80,9 @@ export class LoginComponent {
 
   navigateToRegister() {
     this.router.navigate(['/register']);
+  }
+
+  isFormValid(): boolean {
+    return !!this.email?.trim() && !!this.password?.trim();
   }
 }

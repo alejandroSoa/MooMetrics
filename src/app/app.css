@@ -181,3 +181,50 @@ ion-content {
   overflow: hidden; /* Remove scrolling from chat area */
 }
 
+/* Admin Toggle Styles */
+.admin-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+}
+
+.admin-toggle-icon {
+  width: 32px;
+  height: 32px;
+  background-color: #333;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.admin-toggle-icon:hover {
+  background-color: #444;
+}
+
+.toggle-switch {
+  cursor: pointer;
+  font-size: 20px;
+  transition: color 0.3s ease;
+}
+
+.toggle-on {
+  color: #4CAF50;
+}
+
+.toggle-off {
+  color: #666;
+}
+
+.admin-nav-logo {
+  width: 32px !important;
+  height: 32px !important;
+  font-size: 8px !important;
+}

@@ -1,0 +1,110 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="goBack()" text="Roles"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="custom-title">Detalle del Rol</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="role-detail-container">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando detalle del rol...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && errorMessage" class="error-container">
+      <div class="error-message">
+        {{ errorMessage }}
+      </div>
+      <ion-button fill="outline" (click)="goBack()">
+        Volver a Roles
+      </ion-button>
+    </div>
+
+    <!-- Role Detail Content -->
+    <div *ngIf="!isLoading && !errorMessage && role" class="role-detail-content">
+      <!-- Success Message -->
+
+      <ion-card class="role-edit-card">
+        <ion-card-header>
+          <ion-card-title class="role-title">
+            <span>Editar Rol</span>
+            <span class="role-id" [class]="getRoleTypeClass(role.name)">
+              ID: {{ role.id }}
+            </span>
+          </ion-card-title>
+        </ion-card-header>
+        
+        <ion-card-content>
+          <form class="role-form" (ngSubmit)="saveRole()">
+            <!-- Role Name -->
+            <ion-item class="form-item">
+              <ion-label position="stacked">Nombre del Rol</ion-label>
+              <ion-input 
+                type="text" 
+                [(ngModel)]="role.name" 
+                name="roleName"
+                placeholder="Ingrese el nombre del rol"
+                [clearInput]="true"
+                required>
+              </ion-input>
+            </ion-item>
+
+            <!-- Role Description -->
+            <ion-item class="form-item">
+              <ion-label position="stacked">Descripción</ion-label>
+              <ion-textarea 
+                [(ngModel)]="role.description" 
+                name="roleDescription"
+                placeholder="Ingrese la descripción del rol"
+                rows="4"
+                [clearOnEdit]="false"
+                required>
+              </ion-textarea>
+            </ion-item>
+
+            <!-- Action Buttons -->
+            <div class="button-group">
+              <ion-button 
+                expand="block" 
+                type="submit"
+                [disabled]="!isFormValid() || !hasChanges() || isSaving"
+                class="save-button">
+                <ion-spinner *ngIf="isSaving" name="dots"></ion-spinner>
+                <span *ngIf="!isSaving">Guardar Cambios</span>
+                <span *ngIf="isSaving">Guardando...</span>
+              </ion-button>
+
+              <ion-button 
+                expand="block" 
+                fill="outline" 
+                (click)="cancelEdit()"
+                [disabled]="!hasChanges() || isSaving"
+                class="cancel-button">
+                Cancelar Cambios
+              </ion-button>
+
+              <ion-button 
+                expand="block" 
+                fill="clear" 
+                (click)="goBack()"
+                [disabled]="isSaving"
+                class="back-button">
+                Volver a Lista de Roles
+              </ion-button>
+
+            <div *ngIf="successMessage" class="success-message">
+                {{ successMessage }}
+            </div>
+
+            </div>
+          </form>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

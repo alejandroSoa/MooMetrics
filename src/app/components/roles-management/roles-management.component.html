@@ -1,0 +1,56 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="custom-title">Gestión de Roles</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="roles-container">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando roles...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && errorMessage" class="error-container">
+      <div class="error-message">
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <!-- Roles Content -->
+    <div *ngIf="!isLoading && !errorMessage" class="roles-content">
+      
+      <!-- Empty State -->
+      <div *ngIf="roles.length === 0" class="empty-state">
+        <p>No se encontraron roles en el sistema.</p>
+      </div>
+
+      <!-- Roles List -->
+      <ion-list *ngIf="roles.length > 0">
+        <ion-card *ngFor="let role of roles" class="role-card" (click)="viewRoleDetail(role.id)">
+          <ion-card-header>
+            <ion-card-title class="role-title">
+              <span class="role-name">{{ getRoleDisplayName(role.name) }}</span>
+              <ion-badge [class]="getRoleTypeClass(role.name)" class="role-badge">
+                ID: {{ role.id }}
+              </ion-badge>
+            </ion-card-title>
+          </ion-card-header>
+          
+          <ion-card-content>
+            <div class="role-info">
+              <div class="role-detail">
+                <strong>Nombre técnico:</strong> {{ role.name }}
+              </div>
+              <div class="role-detail">
+                <strong>Descripción:</strong> {{ role.description }}
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
+    </div>
+  </div>
+</ion-content>

@@ -70,7 +70,8 @@ export class RegisterComponent {
       .subscribe({
         next: (response) => {
           console.log('Registration successful:', response);
-          this.router.navigate(['/home']);
+          // Navigate to login after successful registration
+          this.router.navigate(['/login']);
         },
         error: (error) => {
           console.error('Registration failed:', error);
@@ -92,24 +93,11 @@ export class RegisterComponent {
   }
 
   isFormValid(): boolean {
-    const isValid = !!this.formData.firstName?.trim() && 
-                   !!this.formData.lastName?.trim() && 
-                   !!this.formData.email?.trim() && 
-                   !!this.formData.password?.trim() && 
-                   !!this.formData.confirmPassword?.trim() &&
-                   this.formData.password === this.formData.confirmPassword;
-    
-    // Debug logging to help identify the issue
-    console.log('Form validation check:', {
-      firstName: !!this.formData.firstName?.trim(),
-      lastName: !!this.formData.lastName?.trim(),
-      email: !!this.formData.email?.trim(),
-      password: !!this.formData.password?.trim(),
-      confirmPassword: !!this.formData.confirmPassword?.trim(),
-      passwordsMatch: this.formData.password === this.formData.confirmPassword,
-      isValid: isValid
-    });
-    
-    return isValid;
+    return !!this.formData.firstName?.trim() && 
+           !!this.formData.lastName?.trim() && 
+           !!this.formData.email?.trim() && 
+           !!this.formData.password?.trim() && 
+           !!this.formData.confirmPassword?.trim() &&
+           this.formData.password === this.formData.confirmPassword;
   }
 }

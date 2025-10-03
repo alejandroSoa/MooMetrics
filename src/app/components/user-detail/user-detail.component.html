@@ -1,0 +1,124 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="goBack()" text="Usuarios"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="custom-title">Detalle del Usuario</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="user-detail-container">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando detalle del usuario...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && errorMessage" class="error-container">
+      <div class="error-message">
+        {{ errorMessage }}
+      </div>
+      <ion-button fill="outline" (click)="goBack()">
+        Volver a Usuarios
+      </ion-button>
+    </div>
+
+    <!-- User Detail Content -->
+    <div *ngIf="!isLoading && !errorMessage && user" class="user-detail-content">
+      <ion-card class="user-edit-card">
+        <ion-card-header>
+          <ion-card-title class="user-title">
+            <span>Editar Usuario</span>
+            <span class="user-id" [class]="getRoleTypeClass(user.roleId)">
+              ID: {{ user.id }}
+            </span>
+          </ion-card-title>
+        </ion-card-header>
+        
+        <ion-card-content>
+          <form class="user-form" (ngSubmit)="saveUser()">
+            <!-- User Name -->
+            <ion-item class="form-item">
+              <ion-label position="stacked">Nombre Completo</ion-label>
+              <ion-input 
+                type="text" 
+                [(ngModel)]="user.name" 
+                name="userName"
+                placeholder="Ingrese el nombre completo"
+                [clearInput]="true"
+                required>
+              </ion-input>
+            </ion-item>
+
+            <!-- User Email -->
+            <ion-item class="form-item">
+              <ion-label position="stacked">Email</ion-label>
+              <ion-input 
+                type="email" 
+                [(ngModel)]="user.email" 
+                name="userEmail"
+                placeholder="usuario@email.com"
+                [clearInput]="true"
+                required>
+              </ion-input>
+            </ion-item>
+
+            <!-- User Role -->
+            <ion-item class="form-item">
+              <ion-label position="stacked">Rol</ion-label>
+              <ion-select 
+                [(ngModel)]="user.roleId" 
+                name="userRole"
+                placeholder="Seleccione un rol"
+                interface="popover"
+                required>
+                <ion-select-option 
+                  *ngFor="let role of roles" 
+                  [value]="role.id">
+                  {{ getRoleName(role.id) }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <!-- Action Buttons -->
+            <div class="button-group">
+              <ion-button 
+                expand="block" 
+                type="submit"
+                [disabled]="!isFormValid() || !hasChanges() || isSaving"
+                class="save-button">
+                <ion-spinner *ngIf="isSaving" name="dots"></ion-spinner>
+                <span *ngIf="!isSaving">Guardar Cambios</span>
+                <span *ngIf="isSaving">Guardando...</span>
+              </ion-button>
+
+              <ion-button 
+                expand="block" 
+                fill="outline" 
+                (click)="cancelEdit()"
+                [disabled]="!hasChanges() || isSaving"
+                class="cancel-button">
+                Cancelar Cambios
+              </ion-button>
+
+              <ion-button 
+                expand="block" 
+                fill="clear" 
+                (click)="goBack()"
+                [disabled]="isSaving"
+                class="back-button">
+                Volver a Lista de Usuarios
+              </ion-button>
+
+              <div *ngIf="successMessage" class="success-message">
+                {{ successMessage }}
+              </div>
+            </div>
+          </form>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

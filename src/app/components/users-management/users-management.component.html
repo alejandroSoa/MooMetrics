@@ -1,0 +1,50 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="custom-title">Gestión de Usuarios</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="users-container">
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando usuarios...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage && !isLoading" class="error-container">
+      <p class="error-message">{{ errorMessage }}</p>
+    </div>
+
+    <!-- Users List -->
+    <div *ngIf="!isLoading && !errorMessage" class="users-content">
+      
+      <ion-list>
+        <ion-card *ngFor="let user of users" class="user-card" (click)="viewUserDetail(user.id)">
+          <ion-card-header>
+            <ion-card-title>{{ user.name }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="user-info">
+              <div class="user-detail">
+                <strong>ID:</strong> {{ user.id }}
+              </div>
+              <div class="user-detail">
+                <strong>Email:</strong> {{ user.email }}
+              </div>
+              <div class="user-detail">
+                <strong>Rol:</strong> {{ getRoleName(user.roleId) }}
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
+
+      <!-- Empty State -->
+      <div *ngIf="users.length === 0" class="empty-state">
+        <p>No se encontraron usuarios</p>
+      </div>
+    </div>
+  </div>
+</ion-content>

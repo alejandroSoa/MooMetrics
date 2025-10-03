@@ -2,12 +2,34 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
+import { 
+  IonHeader, 
+  IonToolbar, 
+  IonTitle, 
+  IonContent, 
+  IonItem, 
+  IonLabel, 
+  IonInput, 
+  IonButton, 
+  IonIcon 
+} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    IonHeader, 
+    IonToolbar, 
+    IonTitle, 
+    IonContent, 
+    IonItem, 
+    IonLabel, 
+    IonInput, 
+    IonButton, 
+    IonIcon
+  ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })

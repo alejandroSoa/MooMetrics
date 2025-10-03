@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { 
   IonHeader, 
   IonToolbar, 
@@ -14,7 +16,10 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  IonBadge
+  IonBadge,
+  IonButtons,
+  IonButton,
+  IonIcon
 } from '@ionic/angular/standalone';
 import { RoleService, Role, RolesResponse } from '../../services/role.service';
 
@@ -23,6 +28,7 @@ import { RoleService, Role, RolesResponse } from '../../services/role.service';
   standalone: true,
   imports: [
     CommonModule,
+    FontAwesomeModule,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -33,12 +39,17 @@ import { RoleService, Role, RolesResponse } from '../../services/role.service';
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-    IonBadge
+    IonBadge,
+    IonButtons,
+    IonButton
   ],
   templateUrl: './roles-management.component.html',
   styleUrls: ['./roles-management.component.css']
 })
 export class RolesManagementComponent implements OnInit {
+  // FontAwesome icons
+  faPlus = faPlus;
+
   roles: Role[] = [];
   isLoading = true;
   errorMessage = '';
@@ -90,5 +101,9 @@ export class RolesManagementComponent implements OnInit {
 
   viewRoleDetail(roleId: number): void {
     this.router.navigate(['/admin/roles', roleId]);
+  }
+
+  addNewRole(): void {
+    this.router.navigate(['/admin/roles/new']);
   }
 }

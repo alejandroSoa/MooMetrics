@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button (click)="goBack()" text="Roles"></ion-back-button>
     </ion-buttons>
-    <ion-title class="custom-title">Detalle del Rol</ion-title>
+    <ion-title class="custom-title">{{ isNewRole ? 'Crear Nuevo Rol' : 'Detalle del Rol' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -75,17 +75,17 @@
                 [disabled]="!isFormValid() || !hasChanges() || isSaving"
                 class="save-button">
                 <ion-spinner *ngIf="isSaving" name="dots"></ion-spinner>
-                <span *ngIf="!isSaving">Guardar Cambios</span>
-                <span *ngIf="isSaving">Guardando...</span>
+                <span *ngIf="!isSaving">{{ isNewRole ? 'Crear Rol' : 'Guardar Cambios' }}</span>
+                <span *ngIf="isSaving">{{ isNewRole ? 'Creando...' : 'Guardando...' }}</span>
               </ion-button>
 
               <ion-button 
                 expand="block" 
                 fill="outline" 
                 (click)="cancelEdit()"
-                [disabled]="!hasChanges() || isSaving"
+                [disabled]="isSaving"
                 class="cancel-button">
-                Cancelar Cambios
+                {{ isNewRole ? 'Cancelar' : 'Cancelar Cambios' }}
               </ion-button>
 
               <ion-button 

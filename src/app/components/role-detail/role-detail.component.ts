@@ -21,7 +21,7 @@ import {
   IonButtons,
   IonBackButton
 } from '@ionic/angular/standalone';
-import { RoleService, Role, RoleResponse, UpdateRoleRequest } from '../../services/role.service';
+import { RoleService, Role, RoleResponse, UpdateRoleRequest, CreateRoleRequest } from '../../services/role.service';
 
 @Component({
   selector: 'app-role-detail',
@@ -57,6 +57,7 @@ export class RoleDetailComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   roleId: number = 0;
+  isNewRole = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -66,9 +67,26 @@ export class RoleDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      this.roleId = +params['id'];
-      this.loadRole();
+      const id = params['id'];
+      console.log(id)
+      if (id === 'new') {
+        this.isNewRole = true;
+        this.initializeNewRole();
+      } else {
+        this.roleId = +id;
+        this.loadRole();
+      }
     });
+  }
+
+  initializeNewRole() {
+    this.isLoading = false;
+    this.role = {
+      id: 0,
+      name: '',
+      description: ''
+    };
+    this.originalRole = null;
   }
 
   loadRole() {
@@ -102,38 +120,74 @@ export class RoleDetailComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    const updateData: UpdateRoleRequest = {
-      name: this.role.name.trim(),
-      description: this.role.description.trim()
-    };
+    if (this.isNewRole) {
+      // Create new role
+      const createData: CreateRoleRequest = {
+        name: this.role.name.trim(),
+        description: this.role.description.trim()
+      };
 
-    this.roleService.updateRole(this.roleId, updateData).subscribe({
-      next: (response: RoleResponse) => {
-        if (response.status === 'success') {
-          this.successMessage = 'Rol actualizado correctamente. Regresando a la lista...';
-          this.originalRole = { ...response.data };
-          this.role = { ...response.data };
-          
-          // Redirect to roles list after successful update
-          setTimeout(() => {
-            this.router.navigate(['/admin/roles']);
-          }, 1500);
-        } else {
-          this.errorMessage = response.message || 'Error al actualizar el rol';
+      this.roleService.createRole(createData).subscribe({
+        next: (response: RoleResponse) => {
+          if (response.status === 'success') {
+            this.successMessage = 'Rol creado correctamente. Regresando a la lista...';
+            
+            // Redirect to roles list after successful creation
+            setTimeout(() => {
+              this.router.navigate(['/admin/roles']);
+            }, 1500);
+          } else {
+            this.errorMessage = response.message || 'Error al crear el rol';
+          }
+          this.isSaving = false;
+        },
+        error: (error) => {
+          console.error('Error creating role:', error);
+          this.errorMessage = 'Error al crear el rol';
+          this.isSaving = false;
         }
-        this.isSaving = false;
-      },
-      error: (error) => {
-        console.error('Error updating role:', error);
-        this.errorMessage = 'Error al actualizar el rol';
-        this.isSaving = false;
-      }
-    });
+      });
+    } else {
+      // Update existing role
+      const updateData: UpdateRoleRequest = {
+        name: this.role.name.trim(),
+        description: this.role.description.trim()
+      };
+
+      this.roleService.updateRole(this.roleId, updateData).subscribe({
+        next: (response: RoleResponse) => {
+          if (response.status === 'success') {
+            this.successMessage = 'Rol actualizado correctamente. Regresando a la lista...';
+            this.originalRole = { ...response.data };
+            this.role = { ...response.data };
+            
+            // Redirect to roles list after successful update
+            setTimeout(() => {
+              this.router.navigate(['/admin/roles']);
+            }, 1500);
+          } else {
+            this.errorMessage = response.message || 'Error al actualizar el rol';
+          }
+          this.isSaving = false;
+        },
+        error: (error) => {
+          console.error('Error updating role:', error);
+          this.errorMessage = 'Error al actualizar el rol';
+          this.isSaving = false;
+        }
+      });
+    }
   }
 
   cancelEdit() {
-    if (this.originalRole) {
-      this.role = { ...this.originalRole };
+    if (this.isNewRole) {
+      // En modo nuevo, regresar a la lista de roles
+      this.router.navigate(['/admin/roles']);
+    } else {
+      // En modo edición, restaurar valores originales
+      if (this.originalRole) {
+        this.role = { ...this.originalRole };
+      }
     }
     this.errorMessage = '';
     this.successMessage = '';
@@ -144,6 +198,12 @@ export class RoleDetailComponent implements OnInit {
   }
 
   hasChanges(): boolean {
+    // En modo nuevo, permitir guardar si los campos están llenos
+    if (this.isNewRole) {
+      return this.isFormValid();
+    }
+    
+    // En modo edición, verificar si hay cambios respecto al original
     if (!this.role || !this.originalRole) return false;
     
     return this.role.name.trim() !== this.originalRole.name.trim() ||

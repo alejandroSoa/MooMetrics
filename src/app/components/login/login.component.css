@@ -101,6 +101,18 @@
 .password-toggle {
   --color: #666;
   --color-hover: #000;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
+.password-toggle fa-icon {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
 }
 
 /* Forgot Password */

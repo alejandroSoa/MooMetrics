@@ -26,6 +26,11 @@ export interface UpdateRoleRequest {
   description: string;
 }
 
+export interface CreateRoleRequest {
+  name: string;
+  description: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -56,6 +61,14 @@ export class RoleService {
   updateRole(id: number, roleData: UpdateRoleRequest): Observable<RoleResponse> {
     const headers = this.getAuthHeaders();
     return this.http.put<RoleResponse>(`${this.API_URL}/roles/${id}`, roleData, { headers });
+  }
+
+  /**
+   * Create a new role
+   */
+  createRole(roleData: CreateRoleRequest): Observable<RoleResponse> {
+    const headers = this.getAuthHeaders();
+    return this.http.post<RoleResponse>(`${this.API_URL}/roles`, roleData, { headers });
   }
 
   /**

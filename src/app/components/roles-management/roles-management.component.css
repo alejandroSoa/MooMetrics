@@ -178,3 +178,16 @@ ion-list {
 ion-card-content {
   padding-top: 10px;
 }
+
+/* Add button styling */
+ion-buttons ion-button fa-icon {
+  font-size: 1.15em; /* 15% más grande */
+  font-weight: 900; /* Más grueso */
+  color: #333;
+}
+
+ion-buttons ion-button:hover fa-icon {
+  color: #000;
+  transform: scale(1.05);
+  transition: all 0.2s ease;
+}

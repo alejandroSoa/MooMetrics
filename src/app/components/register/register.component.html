@@ -65,7 +65,7 @@
             slot="end" 
             class="password-toggle"
             (click)="togglePasswordVisibility()">
-            <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+            <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
           </ion-button>
         </ion-item>
 
@@ -84,14 +84,14 @@
             slot="end" 
             class="password-toggle"
             (click)="toggleConfirmPasswordVisibility()">
-            <ion-icon [name]="showConfirmPassword ? 'eye-off' : 'eye'"></ion-icon>
+            <fa-icon [icon]="showConfirmPassword ? faEyeSlash : faEye"></fa-icon>
           </ion-button>
         </ion-item>
 
         <!-- Password Match Indicator -->
         <div class="password-match" *ngIf="formData.password && formData.confirmPassword">
           <div [class]="formData.password === formData.confirmPassword ? 'match-success' : 'match-error'">
-            <ion-icon [name]="formData.password === formData.confirmPassword ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+            <fa-icon [icon]="formData.password === formData.confirmPassword ? faCheckCircle : faTimesCircle"></fa-icon>
             <span>{{ formData.password === formData.confirmPassword ? 'Las contraseñas coinciden' : 'Las contraseñas no coinciden' }}</span>
           </div>
         </div>

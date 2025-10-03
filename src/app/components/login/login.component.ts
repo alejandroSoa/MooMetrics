@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { 
   IonHeader, 
   IonToolbar, 
@@ -21,17 +23,21 @@ import {
   imports: [
     CommonModule, 
     FormsModule, 
+    FontAwesomeModule,
     IonContent, 
     IonItem, 
     IonLabel, 
     IonInput, 
-    IonButton, 
-    IonIcon
+    IonButton
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  // FontAwesome icons
+  faEye = faEye;
+  faEyeSlash = faEyeSlash;
+
   email: string = '';
   password: string = '';
   showPassword: boolean = false;

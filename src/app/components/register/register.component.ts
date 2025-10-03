@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faEye, faEyeSlash, faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 
 import { 
   IonHeader, 
@@ -22,17 +24,23 @@ import {
   imports: [
     CommonModule, 
     FormsModule, 
+    FontAwesomeModule,
     IonContent, 
     IonItem, 
     IonLabel, 
     IonInput, 
-    IonButton, 
-    IonIcon
+    IonButton
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+  // FontAwesome icons
+  faEye = faEye;
+  faEyeSlash = faEyeSlash;
+  faCheckCircle = faCheckCircle;
+  faTimesCircle = faTimesCircle;
+
   formData = {
     firstName: '',
     lastName: '',

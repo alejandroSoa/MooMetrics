@@ -46,7 +46,6 @@ import { RoleService, Role, RolesResponse } from '../../services/role.service';
     IonSelectOption,
     IonButton,
     IonSpinner,
-    IonIcon,
     IonButtons,
     IonBackButton
   ],

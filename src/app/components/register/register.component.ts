@@ -22,9 +22,6 @@ import {
   imports: [
     CommonModule, 
     FormsModule, 
-    IonHeader, 
-    IonToolbar, 
-    IonTitle, 
     IonContent, 
     IonItem, 
     IonLabel, 

@@ -1,9 +1,15 @@
 {
-  "name": "MooMetrics",
+  "name": "MooMetrics - Gestión y Análisis",
   "short_name": "MooMetrics",
+  "description": "Aplicación de gestión y análisis de métricas con panel administrativo",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "scope": "./",
   "start_url": "./",
+  "theme_color": "#333333",
+  "background_color": "#ffffff",
+  "lang": "es-ES",
+  "categories": ["business", "productivity", "utilities"],
   "icons": [
     {
       "src": "icons/icon-72x72.png",

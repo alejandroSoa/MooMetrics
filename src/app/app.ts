@@ -5,13 +5,14 @@ import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faUsers, faBell, faSearch, faUserShield, faToggleOn, faToggleOff, faChartLine, faUserTag } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faBell, faSearch, faUserShield, faToggleOn, faToggleOff, faChartLine, faUserTag, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { IonApp, IonToggle } from '@ionic/angular/standalone';
 import { AdminModeService } from './services/admin-mode.service';
+import { InstallPromptComponent } from './components/install-prompt/install-prompt.component';
 
 @Component({
   selector: 'app-root',
-  imports: [IonApp, CommonModule, FormsModule, FontAwesomeModule, RouterModule],
+  imports: [IonApp, CommonModule, FormsModule, FontAwesomeModule, RouterModule, InstallPromptComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -24,8 +25,10 @@ export class App implements OnInit {
   faToggleOff = faToggleOff;
   faChartLine = faChartLine;
   faUserTag = faUserTag;
+  faArrowRightFromBracket = faArrowRightFromBracket;
   currentUrl = signal('');
   isAdminMode = signal(false);
+  showLogoutConfirm = signal(false);
 
   constructor(private router: Router, private adminModeService: AdminModeService) {}
 
@@ -61,5 +64,19 @@ export class App implements OnInit {
 
   toggleAdminMode(): void {
     this.adminModeService.toggleAdminMode();
+  }
+
+  showLogoutConfirmation(): void {
+    this.showLogoutConfirm.set(true);
+  }
+
+  confirmLogout(): void {
+    localStorage.removeItem('moo_auth_token');
+    this.router.navigate(['/login']);
+    this.showLogoutConfirm.set(false);
+  }
+
+  cancelLogout(): void {
+    this.showLogoutConfirm.set(false);
   }
 }

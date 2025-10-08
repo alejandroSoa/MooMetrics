@@ -66,6 +66,13 @@
             <fa-icon [icon]="faUserTag"></fa-icon>
           </a>
         </div>
+
+        <div class="nav-icon-container">
+          <div class="nav-active-indicator" *ngIf="isActive('/admin/stables')"></div>
+          <a class="nav-icon" [routerLink]="['/admin/stables']">
+            <fa-icon [icon]="faWarehouse"></fa-icon>
+          </a>
+        </div>
       </div>
 
       <!-- Logout Icon -->

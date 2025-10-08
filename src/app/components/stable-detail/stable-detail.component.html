@@ -1,0 +1,106 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="goBack()" text="Establos"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="custom-title">{{ isNewStable ? 'Crear Nuevo Establo' : 'Detalle del Establo' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="stable-detail-container">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando detalle del establo...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && errorMessage" class="error-container">
+      <div class="error-message">
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="success-container">
+      <div class="success-message">
+        {{ successMessage }}
+      </div>
+    </div>
+
+    <!-- Stable Form -->
+    <div *ngIf="!isLoading && !errorMessage && stable" class="stable-form-container">
+      <ion-card class="stable-card">
+        <ion-card-header>
+          <ion-card-title class="stable-title">
+            {{ isNewStable ? 'Información del Nuevo Establo' : 'Información del Establo' }}
+          </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+          <form class="stable-form">
+            
+            <!-- Stable Name -->
+            <ion-item class="form-item">
+              <ion-label position="stacked">Nombre del Establo</ion-label>
+              <ion-input 
+                [(ngModel)]="stable.name" 
+                name="name" 
+                placeholder="Ingrese el nombre del establo"
+                [clearInput]="true"
+                required>
+              </ion-input>
+            </ion-item>
+
+            <!-- Active Status -->
+            <ion-item class="form-item toggle-item">
+              <ion-label>
+                <h3>Estado</h3>
+                <p>{{ getStableStatusText(stable.isActive) }}</p>
+              </ion-label>
+              <ion-toggle 
+                [(ngModel)]="stable.isActive" 
+                name="isActive"
+                slot="end">
+              </ion-toggle>
+            </ion-item>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <ion-button 
+                expand="block" 
+                color="dark" 
+                (click)="saveStable()"
+                [disabled]="!isFormValid() || !hasChanges() || isSaving"
+                class="save-button">
+                <ion-spinner *ngIf="isSaving" name="dots"></ion-spinner>
+                <span *ngIf="!isSaving">{{ isNewStable ? 'Crear Establo' : 'Guardar Cambios' }}</span>
+                <span *ngIf="isSaving">{{ isNewStable ? 'Creando...' : 'Guardando...' }}</span>
+              </ion-button>
+
+              <ion-button 
+                expand="block" 
+                fill="outline" 
+                (click)="cancelEdit()"
+                [disabled]="isSaving"
+                class="cancel-button">
+                {{ isNewStable ? 'Cancelar' : 'Cancelar Cambios' }}
+              </ion-button>
+
+              <ion-button 
+                expand="block" 
+                fill="clear" 
+                (click)="goBack()"
+                [disabled]="isSaving"
+                class="back-button">
+                Volver a la Lista
+              </ion-button>
+            </div>
+
+          </form>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

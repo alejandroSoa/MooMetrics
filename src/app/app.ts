@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faUsers, faBell, faSearch, faUserShield, faToggleOn, faToggleOff, faChartLine, faUserTag, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faBell, faSearch, faUserShield, faToggleOn, faToggleOff, faChartLine, faUserTag, faArrowRightFromBracket, faWarehouse } from '@fortawesome/free-solid-svg-icons';
 import { IonApp, IonToggle } from '@ionic/angular/standalone';
 import { AdminModeService } from './services/admin-mode.service';
 import { InstallPromptComponent } from './components/install-prompt/install-prompt.component';
@@ -25,6 +25,7 @@ export class App implements OnInit {
   faToggleOff = faToggleOff;
   faChartLine = faChartLine;
   faUserTag = faUserTag;
+  faWarehouse = faWarehouse;
   faArrowRightFromBracket = faArrowRightFromBracket;
   currentUrl = signal('');
   isAdminMode = signal(false);

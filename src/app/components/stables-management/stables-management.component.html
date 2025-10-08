@@ -1,0 +1,61 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="custom-title">Gestión de Establos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="addNewStable()">
+        <fa-icon [icon]="faPlus"></fa-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="stables-container">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando establos...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && errorMessage" class="error-container">
+      <div class="error-message">
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <!-- Stables Content -->
+    <div *ngIf="!isLoading && !errorMessage" class="stables-content">
+      
+      <!-- Empty State -->
+      <div *ngIf="stables.length === 0" class="empty-state">
+        <p>No se encontraron establos en el sistema.</p>
+      </div>
+
+      <!-- Stables List -->
+      <ion-list *ngIf="stables.length > 0">
+        <ion-card *ngFor="let stable of stables" class="stable-card" (click)="viewStableDetail(stable.id)">
+          <ion-card-header>
+            <ion-card-title class="stable-title">
+              <span class="stable-name">{{ stable.name }}</span>
+              <ion-badge [class]="getStableStatusClass(stable.isActive)" class="stable-badge">
+                {{ getStableStatusText(stable.isActive) }}
+              </ion-badge>
+            </ion-card-title>
+          </ion-card-header>
+          
+          <ion-card-content>
+            <div class="stable-info">
+              <div class="stable-detail">
+                <strong>ID:</strong> {{ stable.id }}
+              </div>
+              <div class="stable-detail">
+                <strong>Estado:</strong> {{ getStableStatusText(stable.isActive) }}
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
+    </div>
+  </div>
+</ion-content>

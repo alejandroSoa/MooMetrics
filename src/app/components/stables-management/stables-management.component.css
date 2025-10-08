@@ -1,0 +1,205 @@
+.stables-container {
+  padding: 20px;
+  height: 100%;
+  background-color: #ffffff;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50%;
+  gap: 20px;
+}
+
+.loading-container p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50%;
+  padding: 20px;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #f44336;
+  font-size: 1.1rem;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.stables-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stables-content h2 {
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.empty-state p {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+/* Stable Cards */
+.stable-card {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  background: #fff;
+}
+
+.stable-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.stable-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.stable-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #ffffff;
+  flex: 1;
+}
+
+.stable-badge {
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+  margin-left: 12px;
+}
+
+/* Stable Status Badge Colors */
+.stable-active {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+}
+
+.stable-inactive {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.stable-info {
+  display: flex;
+  color: #000;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stable-detail {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  color: #000000;
+}
+
+.stable-detail strong {
+  margin-right: 8px;
+  color: #000;
+  min-width: 60px;
+}
+
+/* Add button styling */
+ion-buttons ion-button fa-icon {
+  font-size: 1.15em; /* 15% más grande */
+  font-weight: 900; /* Más grueso */
+  color: #000;
+}
+
+ion-buttons ion-button:hover fa-icon {
+  color: #000;
+  transform: scale(1.05);
+  transition: all 0.2s ease;
+}
+
+/* List styling */
+ion-list {
+  background: transparent;
+  padding: 0;
+}
+
+ion-card-content {
+  padding-top: 10px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .stables-container {
+    padding: 16px;
+  }
+  
+  .stable-card {
+    margin-bottom: 12px;
+  }
+  
+  .stable-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .stable-badge {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+  
+  .stable-name {
+    font-size: 1.2rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .stables-container {
+    background-color: #ffffff;
+  }
+  
+  .stable-card {
+    background: #ffffff;
+    color: #000;
+  }
+  
+  .stable-name {
+    color: #000;
+  }
+  
+  .stable-detail {
+    color: #000;
+  }
+  
+  .stable-detail strong {
+    color: #000;
+  }
+}

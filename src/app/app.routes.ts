@@ -9,6 +9,8 @@ import { UsersManagementComponent } from './components/users-management/users-ma
 import { RolesManagementComponent } from './components/roles-management/roles-management.component';
 import { RoleDetailComponent } from './components/role-detail/role-detail.component';
 import { UserDetailComponent } from './components/user-detail/user-detail.component';
+import { StablesManagementComponent } from './components/stables-management/stables-management.component';
+import { StableDetailComponent } from './components/stable-detail/stable-detail.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -63,6 +65,16 @@ export const routes: Routes = [
   {
     path: 'admin/roles/:id',
     component: RoleDetailComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'admin/stables',
+    component: StablesManagementComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'admin/stables/:id',
+    component: StableDetailComponent,
     canActivate: [AuthGuard]
   }
 ];

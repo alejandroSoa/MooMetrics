@@ -147,9 +147,12 @@
 }
 
 .toggle-icon {
-  font-size: 12px;
+  font-size: 14px;
   color: #666;
   transition: transform 0.2s;
+  font-weight: bold;
+  min-width: 16px;
+  text-align: center;
 }
 
 .sub-items {
@@ -243,7 +246,6 @@
 .message-header {
   display: flex;
   align-items: center;
-  gap: 8px;
   margin-bottom: 4px;
 }
 
@@ -251,11 +253,6 @@
   font-weight: 600;
   color: #333;
   font-size: 14px;
-}
-
-.timestamp {
-  font-size: 12px;
-  color: #999;
 }
 
 .message-text {
@@ -438,6 +435,14 @@ html, body {
     font-size: 16px;
   }
 
+  .toggle-icon {
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+  }
+
   .sub-items {
     margin-left: 8px;
     margin-top: 4px;
@@ -512,11 +517,6 @@ html, body {
   .username {
     font-size: 14px;
     font-weight: 600;
-  }
-
-  .timestamp {
-    font-size: 11px;
-    color: #999;
   }
 
   .message-text {
@@ -618,5 +618,90 @@ html, body {
     font-size: 11px !important;
     width: 11px !important;
     height: 11px !important;
+  }
+}
+
+/* ==================== NEW LOADING STATES ==================== */
+
+/* Loading and Error States */
+.loading-state,
+.error-state {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.error-state {
+  color: #d32f2f;
+  background-color: #ffebee;
+  border-radius: 8px;
+  margin: 10px;
+}
+
+.loading-channels,
+.empty-channels {
+  padding: 10px 15px;
+  font-style: italic;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.loading-messages {
+  color: #999;
+  font-size: 0.8rem;
+  margin-left: 5px;
+}
+
+/* No channel selected state */
+.no-channel-selected {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+/* Loading messages area */
+.loading-messages-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Messages container */
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Disabled send button */
+.send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Mobile specific loading states */
+@media (max-width: 768px) {
+  .loading-state,
+  .error-state {
+    padding: 15px;
+    font-size: 0.9rem;
+  }
+  
+  .loading-channels,
+  .empty-channels {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .no-channel-selected {
+    font-size: 1rem;
+    padding: 20px;
   }
 }

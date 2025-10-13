@@ -30,6 +30,7 @@ export class App implements OnInit {
   currentUrl = signal('');
   isAdminMode = signal(false);
   showLogoutConfirm = signal(false);
+  private previousAdminMode: boolean | null = null;
 
   constructor(private router: Router, private adminModeService: AdminModeService) {}
 
@@ -42,9 +43,24 @@ export class App implements OnInit {
       this.currentUrl.set(event.url);
     });
 
-    // Subscribe to admin mode changes
+    // Subscribe to admin mode changes and handle navigation
     this.adminModeService.getAdminModeStatus().subscribe(isAdmin => {
+      const wasAdminMode = this.previousAdminMode;
       this.isAdminMode.set(isAdmin);
+      
+      // Only redirect if this is a change (not initial load)
+      if (wasAdminMode !== null && wasAdminMode !== isAdmin) {
+        if (isAdmin) {
+          // Admin mode activated - redirect to admin
+          this.router.navigate(['/admin']);
+        } else {
+          // Admin mode deactivated - redirect to home
+          this.router.navigate(['/home']);
+        }
+      }
+      
+      // Update previous state
+      this.previousAdminMode = isAdmin;
     });
   }
 

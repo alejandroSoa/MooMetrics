@@ -11,6 +11,8 @@ import { RoleDetailComponent } from './components/role-detail/role-detail.compon
 import { UserDetailComponent } from './components/user-detail/user-detail.component';
 import { StablesManagementComponent } from './components/stables-management/stables-management.component';
 import { StableDetailComponent } from './components/stable-detail/stable-detail.component';
+import { ChannelCreateComponent } from './components/channel-create/channel-create.component';
+import { ChannelDetailComponent } from './components/channel-detail/channel-detail.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -75,6 +77,16 @@ export const routes: Routes = [
   {
     path: 'admin/stables/:id',
     component: StableDetailComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'admin/channels/:stableId',
+    component: ChannelCreateComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'admin/channels/:id/detail',
+    component: ChannelDetailComponent,
     canActivate: [AuthGuard]
   }
 ];

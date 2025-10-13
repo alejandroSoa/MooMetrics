@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSignal, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { 
   IonHeader, 
   IonToolbar, 
@@ -22,6 +22,7 @@ import {
   IonIcon
 } from '@ionic/angular/standalone';
 import { StableService, Stable, StablesResponse } from '../../services/stable.service';
+import { ChannelService, Channel, ChannelsResponse } from '../../services/channel.service';
 
 @Component({
   selector: 'app-stables-management',
@@ -49,12 +50,25 @@ import { StableService, Stable, StablesResponse } from '../../services/stable.se
 export class StablesManagementComponent implements OnInit {
   // FontAwesome icons
   faPlus = faPlus;
+  faSignal = faSignal;
+  faChevronDown = faChevronDown;
+  faChevronUp = faChevronUp;
 
   stables: Stable[] = [];
   isLoading = true;
   errorMessage = '';
+  
+  // Channels data
+  channels: { [stableId: number]: Channel[] } = {};
+  isChannelsExpanded: { [stableId: number]: boolean } = {};
+  loadingChannels: { [stableId: number]: boolean } = {};
+  channelsError: { [stableId: number]: string } = {};
 
-  constructor(private stableService: StableService, private router: Router) {}
+  constructor(
+    private stableService: StableService, 
+    private channelService: ChannelService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadStables();
@@ -95,5 +109,79 @@ export class StablesManagementComponent implements OnInit {
 
   addNewStable(): void {
     this.router.navigate(['/admin/stables/new']);
+  }
+
+  // ==================== Channels Methods ====================
+
+  /**
+   * Toggle the expansion of channels section for a stable
+   */
+  toggleChannels(stableId: number): void {
+    this.isChannelsExpanded[stableId] = !this.isChannelsExpanded[stableId];
+    
+    // Load channels if expanded and not already loaded
+    if (this.isChannelsExpanded[stableId] && !this.channels[stableId]) {
+      this.loadChannels(stableId);
+    }
+  }
+
+  /**
+   * Load channels for a specific stable
+   */
+  loadChannels(stableId: number): void {
+    this.loadingChannels[stableId] = true;
+    this.channelsError[stableId] = '';
+
+    this.channelService.getChannelsByStableId(stableId).subscribe({
+      next: (response: ChannelsResponse) => {
+        if (response.status === 'success') {
+          this.channels[stableId] = response.data.channels;
+        } else {
+          this.channelsError[stableId] = response.message || 'Error al cargar los canales';
+        }
+        this.loadingChannels[stableId] = false;
+      },
+      error: (error) => {
+        console.error('Error loading channels for stable', stableId, ':', error);
+        this.channelsError[stableId] = 'Error al cargar la lista de canales';
+        this.loadingChannels[stableId] = false;
+      }
+    });
+  }
+
+  /**
+   * Get channels for a specific stable
+   */
+  getChannelsForStable(stableId: number): Channel[] {
+    return this.channels[stableId] || [];
+  }
+
+  /**
+   * Get channel status CSS class
+   */
+  getChannelStatusClass(isActive: boolean): string {
+    return isActive ? 'channel-active' : 'channel-inactive';
+  }
+
+  /**
+   * Get channel status text
+   */
+  getChannelStatusText(isActive: boolean): string {
+    return isActive ? 'Activo' : 'Inactivo';
+  }
+
+  /**
+   * Navigate to channel detail
+   */
+  viewChannelDetail(channelId: number): void {
+    this.router.navigate(['/admin/channels', channelId, 'detail']);
+  }
+
+  /**
+   * Add new channel for a stable
+   */
+  addNewChannel(stableId: number, event: Event): void {
+    event.stopPropagation(); // Prevent triggering the toggle
+    this.router.navigate(['/admin/channels', stableId]);
   }
 }

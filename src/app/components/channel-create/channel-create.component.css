@@ -1,0 +1,213 @@
+.channel-create-container {
+  padding: 20px;
+  height: 100%;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+.error-container, .success-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #f44336;
+  font-size: 1.1rem;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.success-message {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+  font-size: 1.1rem;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.channel-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  flex: 1;
+}
+
+.channel-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  margin-bottom: 20px;
+}
+
+.channel-title {
+  color: #343434;
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+}
+
+.stable-info-section {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.stable-info-text {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.stable-info-text strong {
+  color: #555;
+}
+
+.channel-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-item {
+  --background: transparent;
+  --border-color: #fafafa;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.form-item ion-label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-item ion-input {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  font-size: 16px;
+}
+
+.form-item ion-textarea {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  font-size: 16px;
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.save-button {
+  background: #000;
+  --background-hover: #333;
+  --color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.save-button:disabled {
+  --background: #cccccc;
+  --color: #666;
+}
+
+.cancel-button {
+  --color: #666;
+  --border-color: #ddd;
+  --border-radius: 8px;
+  height: 44px;
+  font-weight: 500;
+}
+
+.back-button {
+  --color: #999;
+  height: 40px;
+  font-size: 14px;
+}
+
+/* Header styling */
+.custom-title {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .channel-create-container {
+    padding: 16px;
+  }
+  
+  .channel-card {
+    margin-bottom: 16px;
+  }
+  
+  .form-item {
+    margin-bottom: 8px;
+  }
+  
+  .form-actions {
+    gap: 10px;
+    margin-top: 16px;
+  }
+  
+  .stable-info-section {
+    padding: 12px;
+  }
+  
+  .stable-info-text {
+    font-size: 0.9rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .channel-create-container {
+    background-color: #ffffff;
+  }
+  
+  .channel-card {
+    background: #ffffff;
+  }
+  
+  .form-item {
+    --border-color: #000000;
+  }
+  
+  .form-item ion-label {
+    color: #555;
+  }
+  
+  .stable-info-section {
+    background-color: #f8f9fa;
+    border-color: #e9ecef;
+  }
+  
+  .stable-info-text {
+    color: #333;
+  }
+  
+  .stable-info-text strong {
+    color: #555;
+  }
+}

@@ -34,26 +34,90 @@
 
       <!-- Stables List -->
       <ion-list *ngIf="stables.length > 0">
-        <ion-card *ngFor="let stable of stables" class="stable-card" (click)="viewStableDetail(stable.id)">
-          <ion-card-header>
-            <ion-card-title class="stable-title">
-              <span class="stable-name">{{ stable.name }}</span>
-              <ion-badge [class]="getStableStatusClass(stable.isActive)" class="stable-badge">
-                {{ getStableStatusText(stable.isActive) }}
-              </ion-badge>
-            </ion-card-title>
-          </ion-card-header>
-          
-          <ion-card-content>
-            <div class="stable-info">
-              <div class="stable-detail">
-                <strong>ID:</strong> {{ stable.id }}
+        <ion-card *ngFor="let stable of stables" class="stable-card">
+          <!-- Main stable card content -->
+          <div class="stable-main-content" (click)="viewStableDetail(stable.id)">
+            <ion-card-header>
+              <ion-card-title class="stable-title">
+                <span class="stable-name">{{ stable.name }}</span>
+                <ion-badge [class]="getStableStatusClass(stable.isActive)" class="stable-badge">
+                  {{ getStableStatusText(stable.isActive) }}
+                </ion-badge>
+              </ion-card-title>
+            </ion-card-header>
+            
+            <ion-card-content>
+              <div class="stable-info">
+                <div class="stable-detail">
+                  <strong>ID:</strong> {{ stable.id }}
+                </div>
+                <div class="stable-detail">
+                  <strong>Estado:</strong> {{ getStableStatusText(stable.isActive) }}
+                </div>
               </div>
-              <div class="stable-detail">
-                <strong>Estado:</strong> {{ getStableStatusText(stable.isActive) }}
+            </ion-card-content>
+          </div>
+
+          <!-- Channels section -->
+          <div class="channels-section">
+            <div class="channels-header" (click)="toggleChannels(stable.id)">
+              <fa-icon [icon]="faSignal" class="channel-icon"></fa-icon>
+              <span class="channels-title">Canales</span>
+              <ion-button 
+                fill="clear" 
+                size="small" 
+                class="add-channel-btn"
+                (click)="addNewChannel(stable.id, $event)">
+                <fa-icon [icon]="faPlus"></fa-icon>
+              </ion-button>
+              <fa-icon 
+                [icon]="isChannelsExpanded[stable.id] ? faChevronUp : faChevronDown" 
+                class="expand-icon">
+              </fa-icon>
+            </div>
+
+            <!-- Channels list -->
+            <div 
+              class="channels-content" 
+              [class.expanded]="isChannelsExpanded[stable.id]"
+              *ngIf="isChannelsExpanded[stable.id]">
+              
+              <!-- Loading channels -->
+              <div *ngIf="loadingChannels[stable.id]" class="channels-loading">
+                <ion-spinner name="dots"></ion-spinner>
+                <span>Cargando canales...</span>
+              </div>
+
+              <!-- Channels error -->
+              <div *ngIf="channelsError[stable.id]" class="channels-error">
+                <p>{{ channelsError[stable.id] }}</p>
+                <ion-button fill="outline" size="small" (click)="loadChannels(stable.id)">
+                  Reintentar
+                </ion-button>
+              </div>
+
+              <!-- Empty channels -->
+              <div *ngIf="!loadingChannels[stable.id] && !channelsError[stable.id] && getChannelsForStable(stable.id).length === 0" class="channels-empty">
+                <p>No hay canales configurados para este establo.</p>
+              </div>
+
+              <!-- Channels list -->
+              <div *ngIf="!loadingChannels[stable.id] && !channelsError[stable.id] && getChannelsForStable(stable.id).length > 0" class="channels-list">
+                <div 
+                  *ngFor="let channel of getChannelsForStable(stable.id)" 
+                  class="channel-item"
+                  (click)="viewChannelDetail(channel.id)">
+                  <div class="channel-info">
+                    <span class="channel-name">{{ channel.name }}</span>
+                    <span class="channel-description" *ngIf="channel.description">{{ channel.description }}</span>
+                  </div>
+                  <ion-badge [class]="getChannelStatusClass(channel.isActive)" class="channel-badge">
+                    {{ getChannelStatusText(channel.isActive) }}
+                  </ion-badge>
+                </div>
               </div>
             </div>
-          </ion-card-content>
+          </div>
         </ion-card>
       </ion-list>
     </div>

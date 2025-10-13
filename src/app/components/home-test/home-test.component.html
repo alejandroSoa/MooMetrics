@@ -11,8 +11,18 @@
   <div class="stables-sidebar" [class.mobile-hidden]="showChat">
     <h3>Available Stables</h3>
     
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <p>Cargando establos...</p>
+    </div>
+    
+    <!-- Error State -->
+    <div *ngIf="!isLoading && errorMessage" class="error-state">
+      <p>{{ errorMessage }}</p>
+    </div>
+    
     <!-- Stable Items -->
-    <div class="stable-list">
+    <div *ngIf="!isLoading && !errorMessage" class="stable-list">
       <div *ngFor="let stable of stables; let i = index" class="stable-item">
         <div class="stable-header" (click)="toggleStable(i)">
           <span class="stable-name">{{ stable.name }}</span>
@@ -23,12 +33,24 @@
         
         <!-- Channels (show when expanded) -->
         <div *ngIf="stable.isExpanded" class="sub-items">
+          <!-- Loading channels -->
+          <div *ngIf="stable.isLoadingChannels" class="loading-channels">
+            <p>Cargando canales...</p>
+          </div>
+          
+          <!-- Empty channels -->
+          <div *ngIf="!stable.isLoadingChannels && stable.channels.length === 0" class="empty-channels">
+            <p>No hay canales disponibles</p>
+          </div>
+          
+          <!-- Channel list -->
           <div 
             *ngFor="let channel of stable.channels; let j = index" 
             class="sub-item"
             [class.active]="channel.isActive"
             (click)="selectChannel(i, j)">
             {{ channel.name }}
+            <span *ngIf="channel.isLoadingMessages" class="loading-messages">...</span>
           </div>
         </div>
       </div>
@@ -39,36 +61,49 @@
   <div class="chat-area" [class.mobile-hidden]="!showChat">
     <!-- Chat Header -->
     <div class="chat-header">
-      <h2>Chat with AI</h2>
+      <h2 *ngIf="selectedChannel">{{ selectedChannel.name }}</h2>
+      <h2 *ngIf="!selectedChannel">Selecciona un canal</h2>
+    </div>
+    
+    <!-- No channel selected -->
+    <div *ngIf="!selectedChannel" class="no-channel-selected">
+      <p>Selecciona un canal para comenzar a chatear</p>
     </div>
     
     <!-- Chat Messages -->
-    <div class="chat-messages">
-      <div *ngFor="let message of currentChatMessages" class="message" [class.bot-message]="message.isBot">
-        <div class="message-avatar">
-          <div class="avatar-circle">
-            {{ message.user.charAt(0) }}
+    <div *ngIf="selectedChannel" class="chat-messages">
+      <!-- Loading messages -->
+      <div *ngIf="selectedChannel.isLoadingMessages" class="loading-messages-area">
+        <p>Cargando mensajes...</p>
+      </div>
+      
+      <!-- Messages -->
+      <div *ngIf="!selectedChannel.isLoadingMessages" class="messages-container">
+        <div *ngFor="let message of currentChatMessages" class="message" [class.bot-message]="message.isBot">
+          <div class="message-avatar">
+            <div class="avatar-circle">
+              {{ message.user.charAt(0) }}
+            </div>
           </div>
-        </div>
-        <div class="message-content">
-          <div class="message-header">
-            <span class="username">{{ message.user }}</span>
-            <span class="timestamp">{{ message.time }}</span>
+          <div class="message-content">
+            <div class="message-header">
+              <span class="username">{{ message.user }}</span>
+            </div>
+            <div class="message-text">{{ message.message }}</div>
           </div>
-          <div class="message-text">{{ message.message }}</div>
         </div>
       </div>
     </div>
     
     <!-- Message Input -->
-    <div class="message-input-container">
+    <div *ngIf="selectedChannel" class="message-input-container">
       <input 
         type="text" 
         placeholder="Type your message here..." 
         [(ngModel)]="messageInput"
         (keyup.enter)="sendMessage()"
         class="message-input">
-      <button (click)="sendMessage()" class="send-button">
+      <button (click)="sendMessage()" class="send-button" [disabled]="!messageInput.trim()">
         <img src="assets/images/send-button-icon.png" alt="Send" style="width:25px;height:25px;" />
       </button>
     </div>

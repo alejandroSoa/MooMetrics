@@ -1,0 +1,139 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="goBack()" text="Atrás"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="custom-title">Canal</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMessage" class="error-container">
+    <ion-card color="danger" class="error-card">
+      <ion-card-content>
+        <p>{{ errorMessage }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="success-container">
+    <ion-card color="success" class="success-card">
+      <ion-card-content>
+        <p>{{ successMessage }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Channel Form -->
+  <div *ngIf="!isLoading && !errorMessage && channel">
+    
+    <!-- Channel Info Card -->
+    <ion-card class="info-card">
+      <ion-card-header>
+        <ion-card-subtitle>Canal ID: {{ channel.id }}</ion-card-subtitle>
+        <ion-card-title>{{ channel.name }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item lines="none" class="info-item">
+          <ion-label>
+            <h3>Establo ID</h3>
+            <p>{{ channel.stableId }}</p>
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none" class="info-item">
+          <ion-label>
+            <h3>Creado por</h3>
+            <p>Usuario {{ channel.createdBy }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Edit Form -->
+    <ion-card class="form-card">
+      <ion-card-header>
+        <ion-card-title>Editar Canal</ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <form class="channel-form">
+          
+          <!-- Channel Name -->
+          <ion-item lines="full" class="form-item">
+            <ion-label position="stacked">Nombre del Canal *</ion-label>
+            <ion-input 
+              [(ngModel)]="channel.name" 
+              name="name" 
+              placeholder="Nombre del canal"
+              [clearInput]="true"
+              type="text"
+              inputmode="text"
+              required>
+            </ion-input>
+          </ion-item>
+
+          <!-- Channel Description -->
+          <ion-item lines="full" class="form-item">
+            <ion-label position="stacked">Descripción</ion-label>
+            <ion-textarea 
+              [(ngModel)]="channel.description"
+              name="description"
+              placeholder="Descripción del canal"
+              rows="3"
+              auto-grow="true">
+            </ion-textarea>
+          </ion-item>
+
+          <!-- Active Status -->
+          <ion-item lines="full" class="toggle-item">
+            <ion-label>
+              <h3>Estado del Canal</h3>
+              <p>{{ getChannelStatusText(channel.isActive) }}</p>
+            </ion-label>
+            <ion-toggle 
+              [(ngModel)]="channel.isActive" 
+              name="isActive"
+              slot="end">
+            </ion-toggle>
+          </ion-item>
+
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <ion-button 
+        expand="block" 
+        fill="solid"
+        color="primary"
+        size="large"
+        (click)="saveChannel()"
+        [disabled]="!isFormValid() || !hasChanges() || isSaving"
+        class="primary-button">
+        <ion-spinner *ngIf="isSaving" name="dots" slot="start"></ion-spinner>
+        {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+      </ion-button>
+
+      <ion-button 
+        expand="block" 
+        fill="outline"
+        color="medium"
+        size="large"
+        (click)="cancelEdit()"
+        [disabled]="isSaving"
+        class="secondary-button">
+        Cancelar Cambios
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>

@@ -1,0 +1,117 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="goBack()" text="Establos"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="custom-title">Detalle del Canal</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="channel-detail-container">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando detalle del canal...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && errorMessage" class="error-container">
+      <div class="error-message">
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="success-container">
+      <div class="success-message">
+        {{ successMessage }}
+      </div>
+    </div>
+
+    <!-- Channel Form -->
+    <div *ngIf="!isLoading && !errorMessage && channel" class="channel-form-container">
+      <ion-card class="channel-card">
+        <ion-card-header>
+          <ion-card-title class="channel-title">
+            Información del Canal
+          </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+          <form class="channel-form">
+            
+            <!-- Channel Name -->
+            <ion-item class="form-item">
+              <ion-label position="stacked">Nombre del Canal</ion-label>
+              <ion-input 
+                [(ngModel)]="channel.name" 
+                name="name" 
+                placeholder="Ingrese el nombre del canal"
+                [clearInput]="true"
+                required>
+              </ion-input>
+            </ion-item>
+
+            <!-- Channel Description -->
+            <ion-item class="form-item">
+              <ion-label position="stacked">Descripción</ion-label>
+              <ion-textarea 
+                [(ngModel)]="channel.description"
+                name="description"
+                placeholder="Ingrese una descripción para el canal"
+                rows="3">
+              </ion-textarea>
+            </ion-item>
+
+            <!-- Active Status -->
+            <ion-item class="form-item toggle-item">
+              <ion-label>
+                <h3>Estado</h3>
+                <p>{{ getChannelStatusText(channel.isActive) }}</p>
+              </ion-label>
+              <ion-toggle 
+                [(ngModel)]="channel.isActive" 
+                name="isActive"
+                slot="end">
+              </ion-toggle>
+            </ion-item>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <ion-button 
+                expand="block" 
+                color="dark" 
+                (click)="saveChannel()"
+                [disabled]="!isFormValid() || !hasChanges() || isSaving"
+                class="save-button">
+                <ion-spinner *ngIf="isSaving" name="dots"></ion-spinner>
+                <span *ngIf="!isSaving">Guardar Cambios</span>
+                <span *ngIf="isSaving">Guardando...</span>
+              </ion-button>
+
+              <ion-button 
+                expand="block" 
+                fill="outline" 
+                (click)="cancelEdit()"
+                [disabled]="isSaving"
+                class="cancel-button">
+                Cancelar Cambios
+              </ion-button>
+
+              <ion-button 
+                expand="block" 
+                fill="clear" 
+                (click)="goBack()"
+                [disabled]="isSaving"
+                class="back-button">
+                Volver a la Lista
+              </ion-button>
+            </div>
+
+          </form>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface User {
   id: number;
@@ -32,7 +33,7 @@ export interface UpdateUserRequest {
   providedIn: 'root'
 })
 export class UserService {
-  private readonly API_URL = 'http://165.227.113.141';
+  private readonly API_URL = environment.apiUrl;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

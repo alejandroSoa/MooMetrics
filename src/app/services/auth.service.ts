@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface LoginRequest {
   email: string;
@@ -21,7 +22,7 @@ export interface LoginResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://165.227.113.141';
+  private readonly API_URL = environment.apiUrl;
   private readonly TOKEN_KEY = 'moo_auth_token';
   
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());

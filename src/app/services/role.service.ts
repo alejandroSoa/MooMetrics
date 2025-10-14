@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface Role {
   id: number;
@@ -35,7 +36,7 @@ export interface CreateRoleRequest {
   providedIn: 'root'
 })
 export class RoleService {
-  private readonly API_URL = 'http://165.227.113.141';
+  private readonly API_URL = environment.apiUrl;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

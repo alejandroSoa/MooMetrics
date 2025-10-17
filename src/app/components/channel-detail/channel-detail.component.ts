@@ -122,13 +122,11 @@ export class ChannelDetailComponent implements OnInit {
         this.isSaving = false;
         if (response.status === 'success') {
           this.successMessage = 'Canal actualizado exitosamente';
-          this.channel = { ...response.data };
-          this.originalChannel = { ...response.data };
           
-          // Clear success message after 3 seconds
+          // Redirect to stables management after successful update
           setTimeout(() => {
-            this.successMessage = '';
-          }, 3000);
+            this.router.navigate(['/admin/stables']);
+          }, 1500);
         } else {
           this.errorMessage = response.message || 'Error al actualizar el canal';
         }

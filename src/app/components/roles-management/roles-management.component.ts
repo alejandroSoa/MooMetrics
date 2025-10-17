@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { 
   IonHeader, 
   IonToolbar, 
@@ -28,7 +26,6 @@ import { RoleService, Role, RolesResponse } from '../../services/role.service';
   standalone: true,
   imports: [
     CommonModule,
-    FontAwesomeModule,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -39,17 +36,12 @@ import { RoleService, Role, RolesResponse } from '../../services/role.service';
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-    IonBadge,
-    IonButtons,
-    IonButton
+    IonBadge
   ],
   templateUrl: './roles-management.component.html',
   styleUrls: ['./roles-management.component.css']
 })
 export class RolesManagementComponent implements OnInit {
-  // FontAwesome icons
-  faPlus = faPlus;
-
   roles: Role[] = [];
   isLoading = true;
   errorMessage = '';
@@ -103,7 +95,8 @@ export class RolesManagementComponent implements OnInit {
     this.router.navigate(['/admin/roles', roleId]);
   }
 
-  addNewRole(): void {
-    this.router.navigate(['/admin/roles/new']);
-  }
+  // Método deshabilitado - No se permite crear nuevos roles
+  // addNewRole(): void {
+  //   this.router.navigate(['/admin/roles/new']);
+  // }
 }

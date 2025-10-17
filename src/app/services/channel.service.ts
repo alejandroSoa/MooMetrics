@@ -74,9 +74,9 @@ export class ChannelService {
   /**
    * Create a new channel for a stable
    */
-  createChannel(stableId: number, channelData: CreateChannelRequest): Observable<ChannelResponse> {
+  createChannel(channelData: CreateChannelRequest): Observable<ChannelResponse> {
     const headers = this.getAuthHeaders();
-    return this.http.post<ChannelResponse>(`${this.API_URL}/channels/${stableId}`, channelData, { headers });
+    return this.http.post<ChannelResponse>(`${this.API_URL}/channels`, channelData, { headers });
   }
 
   /**

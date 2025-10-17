@@ -115,7 +115,7 @@ export class ChannelCreateComponent implements OnInit {
 
     this.isLoading = true;
 
-    this.channelService.createChannel(this.stableId, this.channelData).subscribe({
+    this.channelService.createChannel(this.channelData).subscribe({
       next: (response: ChannelResponse) => {
         this.isLoading = false;
         if (response.status === 'success') {

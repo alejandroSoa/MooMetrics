@@ -62,7 +62,7 @@
 
         <!-- Biometric Login Button -->
         <ion-button 
-          *ngIf="isBiometricAvailable && hasBiometricCredentials"
+          *ngIf="shouldShowBiometric() && hasBiometricCredentials"
           expand="block" 
           fill="outline"
           class="auth-button biometric-button" 
@@ -74,7 +74,7 @@
 
         <!-- Register Biometric Option -->
         <ion-button 
-          *ngIf="isBiometricAvailable && !hasBiometricCredentials && email"
+          *ngIf="shouldShowBiometric() && !hasBiometricCredentials && email"
           expand="block" 
           fill="clear"
           size="small"

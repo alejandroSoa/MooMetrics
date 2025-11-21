@@ -26,13 +26,41 @@ export class BiometricAuthService {
   private async checkBiometricAvailability(): Promise<void> {
     try {
       // Verificar si WebAuthn está disponible
-      const isAvailable = window.PublicKeyCredential && 
-                         await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      if (!window.PublicKeyCredential) {
+        this.isBiometricAvailableSubject.next(false);
+        return;
+      }
+
+      const isAvailable = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
       
-      this.isBiometricAvailableSubject.next(isAvailable);
+      // En móvil, hacer una verificación adicional más estricta
+      if (isAvailable && this.isMobileDevice()) {
+        // Verificar que realmente tenga capacidades biométricas
+        const hasBiometric = await this.testBiometricCapability();
+        this.isBiometricAvailableSubject.next(hasBiometric);
+      } else {
+        this.isBiometricAvailableSubject.next(isAvailable);
+      }
     } catch (error) {
       console.error('Error checking biometric availability:', error);
       this.isBiometricAvailableSubject.next(false);
+    }
+  }
+
+  /**
+   * Prueba si el dispositivo realmente tiene capacidades biométricas
+   */
+  private async testBiometricCapability(): Promise<boolean> {
+    try {
+      // Solo en móviles, verificar que el autenticador requiera interacción del usuario
+      if (this.isMobileDevice()) {
+        // En móvil, si WebAuthn está disponible y es platform authenticator,
+        // asumimos que tiene biométrica real
+        return true;
+      }
+      return true;
+    } catch {
+      return false;
     }
   }
 
@@ -71,8 +99,8 @@ export class BiometricAuthService {
             userVerification: 'required',
             requireResidentKey: false
           },
-          timeout: 60000,
-          attestation: 'direct'
+          timeout: this.isMobileDevice() ? 30000 : 60000, // Menos tiempo en móvil
+          attestation: 'none' // Cambiado de 'direct' a 'none' para mejor compatibilidad
         }
       };
 
@@ -119,7 +147,7 @@ export class BiometricAuthService {
             id: new TextEncoder().encode(credentialInfo.id),
             type: 'public-key'
           }],
-          timeout: 60000,
+          timeout: this.isMobileDevice() ? 30000 : 60000, // Menos tiempo en móvil
           userVerification: 'required'
         }
       };

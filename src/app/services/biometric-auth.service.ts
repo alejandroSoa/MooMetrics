@@ -162,6 +162,17 @@ export class BiometricAuthService {
       return false;
     } catch (error) {
       console.error('Error authenticating with biometric:', error);
+      
+      // Si es un error de credencial no encontrada o inválida, podría ser una credencial corrupta
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError' || 
+            error.name === 'InvalidStateError' ||
+            error.message.includes('not found') ||
+            error.message.includes('invalid')) {
+          console.warn('Possible corrupted credential detected');
+        }
+      }
+      
       return false;
     }
   }
@@ -254,5 +265,29 @@ export class BiometricAuthService {
     } else {
       return 'Activar clave de acceso';
     }
+  }
+
+  /**
+   * Verifica si las credenciales necesitan ser renovadas
+   * (por ejemplo, si son muy antiguas o están corruptas)
+   */
+  shouldRenewCredentials(): boolean {
+    const credentialInfo = this.getStoredCredential();
+    if (!credentialInfo || !credentialInfo.createdAt) {
+      return false;
+    }
+
+    // Verificar si la credencial es muy antigua (más de 90 días)
+    const createdDate = new Date(credentialInfo.createdAt);
+    const daysSinceCreation = (Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
+    
+    return daysSinceCreation > 90;
+  }
+
+  /**
+   * Obtiene información sobre la credencial almacenada
+   */
+  getCredentialInfo(): any {
+    return this.getStoredCredential();
   }
 }

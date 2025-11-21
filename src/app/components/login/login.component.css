@@ -184,6 +184,26 @@
   --background: rgba(45, 211, 111, 0.05);
 }
 
+.remove-biometric-button {
+  --color: #e74c3c;
+  --background: transparent;
+  font-size: 13px;
+  height: 36px;
+  margin: 4px 0;
+  border: 1px solid #e74c3c;
+  border-radius: 8px;
+}
+
+.remove-biometric-button fa-icon {
+  font-size: 14px;
+  margin-right: 6px;
+}
+
+.remove-biometric-button:hover {
+  --background: rgba(231, 76, 60, 0.05);
+  --color: #c0392b;
+}
+
 /* Divider */
 .divider {
   text-align: center;

@@ -153,6 +153,37 @@
   --color: #999;
 }
 
+/* Biometric Authentication Buttons */
+.biometric-button {
+  --background: transparent;
+  --color: #2dd36f;
+  --border-color: #2dd36f;
+  --border-width: 2px;
+  --background-hover: rgba(45, 211, 111, 0.1);
+}
+
+.biometric-button fa-icon {
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+.register-biometric-button {
+  --color: #2dd36f;
+  --background: transparent;
+  font-size: 14px;
+  height: 40px;
+  margin: 8px 0;
+}
+
+.register-biometric-button fa-icon {
+  font-size: 16px;
+  margin-right: 6px;
+}
+
+.register-biometric-button:hover {
+  --background: rgba(45, 211, 111, 0.05);
+}
+
 /* Divider */
 .divider {
   text-align: center;

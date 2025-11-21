@@ -87,7 +87,8 @@ export class AuthService {
    * Check if user is currently authenticated
    */
   isAuthenticated(): boolean {
-    return this.hasToken();
+    const token = this.getToken();
+    return !!token && (token.startsWith('biometric_token_') || this.hasToken());
   }
 
   /**

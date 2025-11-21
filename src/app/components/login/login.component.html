@@ -60,6 +60,30 @@
           {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
         </ion-button>
 
+        <!-- Biometric Login Button -->
+        <ion-button 
+          *ngIf="isBiometricAvailable && hasBiometricCredentials"
+          expand="block" 
+          fill="outline"
+          class="auth-button biometric-button" 
+          (click)="onBiometricLogin()"
+          [disabled]="isBiometricLoading">
+          <fa-icon [icon]="faFingerprint" slot="start"></fa-icon>
+          {{ isBiometricLoading ? 'Verificando...' : 'Iniciar con Huella' }}
+        </ion-button>
+
+        <!-- Register Biometric Option -->
+        <ion-button 
+          *ngIf="isBiometricAvailable && !hasBiometricCredentials && email"
+          expand="block" 
+          fill="clear"
+          size="small"
+          class="register-biometric-button" 
+          (click)="registerBiometric()">
+          <fa-icon [icon]="faFingerprint" slot="start"></fa-icon>
+          Activar acceso con huella
+        </ion-button>
+
         <!-- Divider -->
         <div class="divider">
           <span>o</span>

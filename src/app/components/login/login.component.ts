@@ -76,6 +76,9 @@ export class LoginComponent {
       next: (response) => {
         console.log('Login successful:', response);
         if (response.status === 'success') {
+          // Guardar credenciales para uso con huella digital
+          this.saveUserCredentials(this.email, this.password);
+          
           // Navigate to home after successful login
           this.router.navigate(['/home']);
         }
@@ -117,6 +120,16 @@ export class LoginComponent {
     if (isWebAuthnAvailable) {
       this.isBiometricAvailable = true;
       this.hasBiometricCredentials = this.biometricService.hasBiometricCredentials();
+      
+      // Verificar que también tengamos credenciales de usuario guardadas
+      const savedCredentials = this.getSavedUserCredentials();
+      if (this.hasBiometricCredentials && !savedCredentials) {
+        console.log('Biometric credentials exist but no user credentials found');
+        // Resetear credenciales biométricas si no hay credenciales de usuario
+        this.biometricService.removeBiometricCredentials();
+        this.hasBiometricCredentials = false;
+      }
+      
       console.log('Biometric available:', this.isBiometricAvailable, 'Has credentials:', this.hasBiometricCredentials);
     } else {
       this.isBiometricAvailable = false;
@@ -141,18 +154,46 @@ export class LoginComponent {
       const success = await this.biometricService.authenticateWithBiometric();
       if (success) {
         console.log('Biometric authentication successful');
-        // Simular login exitoso sin necesidad de backend
-        const mockToken = 'biometric_token_' + Date.now();
-        localStorage.setItem('moo_auth_token', mockToken);
-        this.router.navigate(['/home']);
+        
+        // Obtener credenciales guardadas y hacer login automático
+        const savedCredentials = this.getSavedUserCredentials();
+        if (savedCredentials) {
+          console.log('Using saved credentials for automatic login');
+          
+          // Hacer login automático con credenciales guardadas
+          this.authService.login(savedCredentials).subscribe({
+            next: (response) => {
+              console.log('Automatic login successful:', response);
+              if (response.status === 'success') {
+                this.router.navigate(['/home']);
+              } else {
+                console.error('Automatic login failed, removing saved credentials');
+                this.removeSavedUserCredentials();
+                this.biometricError = true;
+              }
+              this.isBiometricLoading = false;
+            },
+            error: (error) => {
+              console.error('Automatic login error:', error);
+              // Si falla el login automático, las credenciales pueden estar obsoletas
+              this.removeSavedUserCredentials();
+              this.biometricError = true;
+              this.isBiometricLoading = false;
+            }
+          });
+        } else {
+          console.error('No saved credentials found');
+          this.biometricError = true;
+          this.isBiometricLoading = false;
+        }
       } else {
         console.error('Biometric authentication failed');
         this.biometricError = true;
+        this.isBiometricLoading = false;
       }
     } catch (error) {
       console.error('Error during biometric authentication:', error);
       this.biometricError = true;
-    } finally {
       this.isBiometricLoading = false;
     }
   }
@@ -161,8 +202,12 @@ export class LoginComponent {
    * Registra credenciales biométricas después del login tradicional
    */
   async registerBiometric(): Promise<void> {
-    if (!this.email || !this.isBiometricAvailable) {
-      console.log('Cannot register biometric:', { email: this.email, available: this.isBiometricAvailable });
+    if (!this.email || !this.password || !this.isBiometricAvailable) {
+      console.log('Cannot register biometric:', { 
+        email: this.email, 
+        password: !!this.password, 
+        available: this.isBiometricAvailable 
+      });
       return;
     }
 
@@ -172,6 +217,10 @@ export class LoginComponent {
       const success = await this.biometricService.registerBiometric(this.email, this.email);
       if (success) {
         console.log('Biometric registration successful');
+        
+        // Guardar credenciales para uso futuro con huella
+        this.saveUserCredentials(this.email, this.password);
+        
         this.hasBiometricCredentials = true;
       } else {
         console.log('Biometric registration failed');
@@ -209,6 +258,7 @@ export class LoginComponent {
     try {
       // Eliminar credenciales almacenadas
       this.biometricService.removeBiometricCredentials();
+      this.removeSavedUserCredentials();
       
       // Resetear estado
       this.hasBiometricCredentials = false;
@@ -225,5 +275,64 @@ export class LoginComponent {
     } catch (error) {
       console.error('Error removing old biometric credentials:', error);
     }
+  }
+
+  /**
+   * Guarda las credenciales del usuario para uso con autenticación biométrica
+   */
+  private saveUserCredentials(email: string, password: string): void {
+    try {
+      const credentials = {
+        email: email,
+        password: password,
+        timestamp: Date.now()
+      };
+      
+      // Encriptar básicamente las credenciales (base64)
+      const encodedCredentials = btoa(JSON.stringify(credentials));
+      localStorage.setItem('moo_user_credentials', encodedCredentials);
+      
+      console.log('User credentials saved for biometric use');
+    } catch (error) {
+      console.error('Error saving user credentials:', error);
+    }
+  }
+
+  /**
+   * Obtiene las credenciales guardadas del usuario
+   */
+  private getSavedUserCredentials(): {email: string, password: string} | null {
+    try {
+      const encodedCredentials = localStorage.getItem('moo_user_credentials');
+      if (!encodedCredentials) {
+        return null;
+      }
+      
+      const credentials = JSON.parse(atob(encodedCredentials));
+      
+      // Verificar que las credenciales no sean muy antiguas (30 días)
+      const daysSinceSaved = (Date.now() - credentials.timestamp) / (1000 * 60 * 60 * 24);
+      if (daysSinceSaved > 30) {
+        console.log('Saved credentials are too old, removing');
+        this.removeSavedUserCredentials();
+        return null;
+      }
+      
+      return {
+        email: credentials.email,
+        password: credentials.password
+      };
+    } catch (error) {
+      console.error('Error retrieving saved credentials:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Elimina las credenciales guardadas del usuario
+   */
+  private removeSavedUserCredentials(): void {
+    localStorage.removeItem('moo_user_credentials');
+    console.log('Saved user credentials removed');
   }
 }

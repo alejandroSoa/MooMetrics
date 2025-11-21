@@ -5,7 +5,7 @@ import { provideHttpClient } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { provideServiceWorker } from '@angular/service-worker';
-import { UpdateService } from './services/update.service';
+import { PwaService } from './services/pwa.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,8 +20,11 @@ export const appConfig: ApplicationConfig = {
           }),
     {
       provide: APP_INITIALIZER,
-      useFactory: (updateService: UpdateService) => () => updateService.initializeUpdateService(),
-      deps: [UpdateService],
+      useFactory: (pwaService: PwaService) => () => {
+        // PwaService se inicializa automáticamente en su constructor
+        return Promise.resolve();
+      },
+      deps: [PwaService],
       multi: true
     }
   ]

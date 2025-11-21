@@ -164,6 +164,10 @@ export class BiometricAuthService {
    * Verifica si la autenticación biométrica está disponible
    */
   async isBiometricAvailable(): Promise<boolean> {
+    // Forzar una nueva verificación si es necesario
+    if (!this.isBiometricAvailableSubject.value) {
+      await this.checkBiometricAvailability();
+    }
     return this.isBiometricAvailableSubject.value;
   }
 

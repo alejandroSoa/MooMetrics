@@ -18,6 +18,19 @@ export interface LoginResponse {
   };
 }
 
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+  roleId: number;
+}
+
+export interface RegisterResponse {
+  status: string;
+  message: string;
+  data?: any;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -82,5 +95,12 @@ export class AuthService {
    */
   getAuthStatus(): Observable<boolean> {
     return this.isAuthenticated$;
+  }
+
+  /**
+   * Register a new user
+   */
+  register(userData: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.API_URL}/auth/register`, userData);
   }
 }

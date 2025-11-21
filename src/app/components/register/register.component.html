@@ -101,8 +101,8 @@
           expand="block" 
           class="auth-button register-button" 
           type="submit"
-          [disabled]="!isFormValid()">
-          Crear Cuenta
+          [disabled]="!isFormValid() || isLoading">
+          {{ isLoading ? 'Creando cuenta...' : 'Crear Cuenta' }}
         </ion-button>
 
         <!-- Divider -->

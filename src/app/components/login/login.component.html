@@ -69,7 +69,7 @@
           (click)="onBiometricLogin()"
           [disabled]="isBiometricLoading">
           <fa-icon [icon]="faFingerprint" slot="start"></fa-icon>
-          {{ isBiometricLoading ? 'Verificando...' : 'Iniciar con Huella' }}
+          {{ isBiometricLoading ? 'Verificando...' : getBiometricButtonText() }}
         </ion-button>
 
         <!-- Register Biometric Option -->
@@ -81,7 +81,7 @@
           class="register-biometric-button" 
           (click)="registerBiometric()">
           <fa-icon [icon]="faFingerprint" slot="start"></fa-icon>
-          Activar acceso con huella
+          {{ getBiometricSetupText() }}
         </ion-button>
 
         <!-- Divider -->

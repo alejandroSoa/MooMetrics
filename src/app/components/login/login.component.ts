@@ -155,4 +155,18 @@ export class LoginComponent {
       console.error('Error registering biometric:', error);
     }
   }
+
+  /**
+   * Obtiene el texto del botón biométrico según el dispositivo
+   */
+  getBiometricButtonText(): string {
+    return this.biometricService.getAuthButtonText();
+  }
+
+  /**
+   * Obtiene el texto de configuración biométrica según el dispositivo
+   */
+  getBiometricSetupText(): string {
+    return this.biometricService.getSetupButtonText();
+  }
 }

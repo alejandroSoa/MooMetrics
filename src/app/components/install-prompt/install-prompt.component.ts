@@ -137,11 +137,11 @@ import { Subscription } from 'rxjs';
     }
 
     .install-icon {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #4a4a4a 0%, #2c2c2c 100%);
     }
 
     .update-icon {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      background: linear-gradient(135deg, #6c6c6c 0%, #404040 100%);
     }
 
     .spinning {
@@ -182,13 +182,13 @@ import { Subscription } from 'rxjs';
       margin: 0 0 8px 0;
       font-size: 20px;
       font-weight: 700;
-      color: #2c3e50;
+      color: #1a1a1a;
       font-family: 'Roboto', sans-serif;
     }
 
     .prompt-body p {
       margin: 0 0 16px 0;
-      color: #7f8c8d;
+      color: #6c6c6c;
       font-size: 14px;
       line-height: 1.5;
       font-family: 'Roboto', sans-serif;
@@ -205,7 +205,7 @@ import { Subscription } from 'rxjs';
       flex-direction: column;
       align-items: center;
       gap: 6px;
-      color: #34495e;
+      color: #4a4a4a;
       font-size: 12px;
       font-weight: 500;
       font-family: 'Roboto', sans-serif;
@@ -214,9 +214,9 @@ import { Subscription } from 'rxjs';
     }
 
     .benefit fa-icon {
-      color: #3498db;
+      color: #4a4a4a;
       font-size: 16px;
-      background: #ecf5ff;
+      background: #f5f5f5;
       padding: 8px;
       border-radius: 8px;
       width: 32px;
@@ -261,23 +261,23 @@ import { Subscription } from 'rxjs';
     }
 
     .primary-btn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
       color: #fff;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 4px 15px rgba(44, 44, 44, 0.4);
     }
 
     .update-prompt .primary-btn {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+      background: linear-gradient(135deg, #4a4a4a 0%, #2c2c2c 100%);
+      box-shadow: 0 4px 15px rgba(74, 74, 74, 0.4);
     }
 
     .primary-btn:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+      box-shadow: 0 6px 20px rgba(44, 44, 44, 0.6);
     }
 
     .update-prompt .primary-btn:hover:not(:disabled) {
-      box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+      box-shadow: 0 6px 20px rgba(74, 74, 74, 0.6);
     }
 
     .primary-btn:disabled,

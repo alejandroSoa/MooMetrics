@@ -184,4 +184,47 @@ export class BiometricAuthService {
   authenticateWithBiometricObservable(): Observable<boolean> {
     return from(this.authenticateWithBiometric());
   }
+
+  /**
+   * Detecta si es un dispositivo móvil
+   */
+  isMobileDevice(): boolean {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  /**
+   * Detecta si es iOS
+   */
+  isIOSDevice(): boolean {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent);
+  }
+
+  /**
+   * Detecta si es Android
+   */
+  isAndroidDevice(): boolean {
+    return /Android/i.test(navigator.userAgent);
+  }
+
+  /**
+   * Obtiene el texto apropiado para el botón según el dispositivo
+   */
+  getAuthButtonText(): string {
+    if (this.isMobileDevice()) {
+      return 'Iniciar con Huella';
+    } else {
+      return 'Iniciar con Clave de Acceso';
+    }
+  }
+
+  /**
+   * Obtiene el texto de configuración según el dispositivo
+   */
+  getSetupButtonText(): string {
+    if (this.isMobileDevice()) {
+      return 'Activar acceso con huella';
+    } else {
+      return 'Activar clave de acceso';
+    }
+  }
 }

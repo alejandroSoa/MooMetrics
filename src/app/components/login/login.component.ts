@@ -105,60 +105,25 @@ export class LoginComponent {
    * Inicializa la configuración biométrica
    */
   private async initializeBiometric(): Promise<void> {
-    // Verificar disponibilidad de WebAuthn
+    // Solo habilitar biométrica en dispositivos móviles
+    if (!this.biometricService.isMobileDevice()) {
+      this.isBiometricAvailable = false;
+      return;
+    }
+
+    // Verificar disponibilidad de WebAuthn en móvil
     const isWebAuthnAvailable = await this.biometricService.isBiometricAvailable();
     
     if (isWebAuthnAvailable) {
-      // En móvil: solo mostrar si es realmente biométrico (huella/face)
-      // En desktop: mostrar clave de acceso
-      if (this.biometricService.isMobileDevice()) {
-        // Para móvil, verificar que tenga sensor biométrico real
-        this.isBiometricAvailable = await this.checkMobileBiometric();
-      } else {
-        // Para desktop, permitir clave de acceso
-        this.isBiometricAvailable = true;
-      }
-      
-      if (this.isBiometricAvailable) {
-        this.hasBiometricCredentials = this.biometricService.hasBiometricCredentials();
-      }
+      this.isBiometricAvailable = true;
+      this.hasBiometricCredentials = this.biometricService.hasBiometricCredentials();
+      console.log('Biometric available:', this.isBiometricAvailable, 'Has credentials:', this.hasBiometricCredentials);
+    } else {
+      this.isBiometricAvailable = false;
     }
   }
 
-  /**
-   * Verifica si el dispositivo móvil tiene biométrica real disponible
-   */
-  private async checkMobileBiometric(): Promise<boolean> {
-    try {
-      // Intentar crear una credencial de prueba para verificar biométrica
-      const challenge = new Uint8Array(32);
-      crypto.getRandomValues(challenge);
-      
-      const createCredentialOptions: CredentialCreationOptions = {
-        publicKey: {
-          challenge: challenge,
-          rp: { name: 'Test', id: window.location.hostname },
-          user: {
-            id: new TextEncoder().encode('test'),
-            name: 'test',
-            displayName: 'test'
-          },
-          pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
-          authenticatorSelection: {
-            authenticatorAttachment: 'platform',
-            userVerification: 'required'
-          },
-          timeout: 10000
-        }
-      };
-      
-      // Solo verificar disponibilidad, no crear realmente
-      const isAvailable = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-      return isAvailable;
-    } catch {
-      return false;
-    }
-  }
+
 
   /**
    * Autentica usando biométrica
@@ -197,14 +162,19 @@ export class LoginComponent {
    */
   async registerBiometric(): Promise<void> {
     if (!this.email || !this.isBiometricAvailable) {
+      console.log('Cannot register biometric:', { email: this.email, available: this.isBiometricAvailable });
       return;
     }
 
+    console.log('Attempting to register biometric for:', this.email);
+    
     try {
       const success = await this.biometricService.registerBiometric(this.email, this.email);
       if (success) {
         console.log('Biometric registration successful');
         this.hasBiometricCredentials = true;
+      } else {
+        console.log('Biometric registration failed');
       }
     } catch (error) {
       console.error('Error registering biometric:', error);
@@ -212,37 +182,24 @@ export class LoginComponent {
   }
 
   /**
-   * Obtiene el texto del botón biométrico según el dispositivo
+   * Obtiene el texto del botón biométrico (solo para móviles)
    */
   getBiometricButtonText(): string {
-    if (this.biometricService.isMobileDevice()) {
-      return 'Iniciar con Huella';
-    } else {
-      return 'Iniciar con Clave de Acceso';
-    }
+    return 'Iniciar con Huella';
   }
 
   /**
-   * Obtiene el texto de configuración biométrica según el dispositivo
+   * Obtiene el texto de configuración biométrica (solo para móviles)
    */
   getBiometricSetupText(): string {
-    if (this.biometricService.isMobileDevice()) {
-      return 'Activar acceso con huella';
-    } else {
-      return 'Activar clave de acceso';
-    }
+    return 'Activar acceso con huella';
   }
 
   /**
-   * Verifica si debe mostrar la opción biométrica
+   * Verifica si debe mostrar la opción biométrica (solo móviles)
    */
   shouldShowBiometric(): boolean {
-    // En móvil: solo mostrar si hay biométrica real disponible
-    // En desktop: mostrar clave de acceso si está disponible
-    return this.isBiometricAvailable && (
-      !this.biometricService.isMobileDevice() || 
-      this.biometricService.isMobileDevice()
-    );
+    return this.isBiometricAvailable && this.biometricService.isMobileDevice();
   }
 
   /**

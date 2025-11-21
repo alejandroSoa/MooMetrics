@@ -104,21 +104,33 @@ export class BiometricAuthService {
         }
       };
 
+      console.log('Creating biometric credential...');
+      
       // Crear credencial
       const credential = await navigator.credentials.create(createCredentialOptions) as PublicKeyCredential;
       
       if (credential) {
-        // Guardar información de la credencial localmente
+        console.log('Credential created successfully:', credential.id);
+        
+        // Guardar información de la credencial localmente con más detalles
         const credentialInfo = {
           id: credential.id,
+          rawId: Array.from(new Uint8Array(credential.rawId)), // Convertir para JSON
           userId: userId,
           userName: userName,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          deviceType: this.isMobileDevice() ? 'mobile' : 'desktop'
         };
         
-        localStorage.setItem(this.CREDENTIAL_KEY, JSON.stringify(credentialInfo));
+        // Guardar tanto en localStorage como en sessionStorage para mayor persistencia
+        const credentialJson = JSON.stringify(credentialInfo);
+        localStorage.setItem(this.CREDENTIAL_KEY, credentialJson);
+        sessionStorage.setItem(this.CREDENTIAL_KEY, credentialJson);
+        
+        console.log('Credential saved:', credentialInfo);
         return true;
       }
+      console.log('Failed to create credential');
       return false;
     } catch (error) {
       console.error('Error registering biometric:', error);
@@ -140,14 +152,24 @@ export class BiometricAuthService {
       const challenge = new Uint8Array(32);
       crypto.getRandomValues(challenge);
 
+      console.log('Authenticating with stored credential:', credentialInfo.id);
+      
+      // Usar rawId si está disponible, sino usar id
+      let credentialId;
+      if (credentialInfo.rawId) {
+        credentialId = new Uint8Array(credentialInfo.rawId);
+      } else {
+        credentialId = new TextEncoder().encode(credentialInfo.id);
+      }
+      
       const getCredentialOptions: CredentialRequestOptions = {
         publicKey: {
           challenge: challenge,
           allowCredentials: [{
-            id: new TextEncoder().encode(credentialInfo.id),
+            id: credentialId,
             type: 'public-key'
           }],
-          timeout: this.isMobileDevice() ? 30000 : 60000, // Menos tiempo en móvil
+          timeout: 30000, // 30 segundos para móvil
           userVerification: 'required'
         }
       };
@@ -188,8 +210,25 @@ export class BiometricAuthService {
    * Obtiene las credenciales almacenadas
    */
   private getStoredCredential(): any {
-    const stored = localStorage.getItem(this.CREDENTIAL_KEY);
-    return stored ? JSON.parse(stored) : null;
+    // Intentar primero desde localStorage, luego sessionStorage
+    let stored = localStorage.getItem(this.CREDENTIAL_KEY);
+    if (!stored) {
+      stored = sessionStorage.getItem(this.CREDENTIAL_KEY);
+    }
+    
+    if (stored) {
+      try {
+        const credential = JSON.parse(stored);
+        console.log('Retrieved stored credential:', credential.id);
+        return credential;
+      } catch (error) {
+        console.error('Error parsing stored credential:', error);
+        return null;
+      }
+    }
+    
+    console.log('No stored credential found');
+    return null;
   }
 
   /**
@@ -197,6 +236,8 @@ export class BiometricAuthService {
    */
   removeBiometricCredentials(): void {
     localStorage.removeItem(this.CREDENTIAL_KEY);
+    sessionStorage.removeItem(this.CREDENTIAL_KEY);
+    console.log('Biometric credentials removed');
   }
 
   /**

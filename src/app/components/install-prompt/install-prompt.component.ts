@@ -141,7 +141,7 @@ import { Subscription } from 'rxjs';
     }
 
     .update-icon {
-      background: linear-gradient(135deg, #6c6c6c 0%, #404040 100%);
+      background: linear-gradient(135deg, #8a8a8a 0%, #5a5a5a 100%);
     }
 
     .spinning {
@@ -214,9 +214,9 @@ import { Subscription } from 'rxjs';
     }
 
     .benefit fa-icon {
-      color: #4a4a4a;
+      color: #7a7a7a;
       font-size: 16px;
-      background: #f5f5f5;
+      background: #f8f8f8;
       padding: 8px;
       border-radius: 8px;
       width: 32px;
@@ -224,6 +224,7 @@ import { Subscription } from 'rxjs';
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
     .prompt-actions {
@@ -260,6 +261,17 @@ import { Subscription } from 'rxjs';
       color: #495057;
     }
 
+    .update-prompt .secondary-btn {
+      background: #f0f0f0;
+      color: #5a5a5a;
+      border: 1px solid #d0d0d0;
+    }
+
+    .update-prompt .secondary-btn:hover:not(:disabled) {
+      background: #e0e0e0;
+      color: #4a4a4a;
+    }
+
     .primary-btn {
       background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
       color: #fff;
@@ -267,8 +279,9 @@ import { Subscription } from 'rxjs';
     }
 
     .update-prompt .primary-btn {
-      background: linear-gradient(135deg, #4a4a4a 0%, #2c2c2c 100%);
-      box-shadow: 0 4px 15px rgba(74, 74, 74, 0.4);
+      background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      border: 1px solid #333;
     }
 
     .primary-btn:hover:not(:disabled) {
@@ -277,7 +290,8 @@ import { Subscription } from 'rxjs';
     }
 
     .update-prompt .primary-btn:hover:not(:disabled) {
-      box-shadow: 0 6px 20px rgba(74, 74, 74, 0.6);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
     }
 
     .primary-btn:disabled,
@@ -285,6 +299,34 @@ import { Subscription } from 'rxjs';
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
+    }
+
+    /* Estilos especiales para prompt de actualización */
+    .update-prompt {
+      border: 1px solid #e0e0e0;
+    }
+
+    .update-prompt .prompt-header {
+      background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .update-prompt .prompt-body h3 {
+      color: #2a2a2a;
+    }
+
+    .update-prompt .prompt-body p {
+      color: #5a5a5a;
+    }
+
+    .update-prompt .benefit {
+      color: #4a4a4a;
+    }
+
+    .update-prompt .benefit fa-icon {
+      color: #6a6a6a;
+      background: #fafafa;
+      border: 1px solid #e8e8e8;
     }
 
     @media (max-width: 768px) {

@@ -84,6 +84,18 @@
           {{ getBiometricSetupText() }}
         </ion-button>
 
+        <!-- Remove Old Biometric Credentials -->
+        <ion-button 
+          *ngIf="shouldShowBiometric() && hasBiometricCredentials && biometricError"
+          expand="block" 
+          fill="clear"
+          size="small"
+          class="remove-biometric-button" 
+          (click)="removeOldBiometric()">
+          <fa-icon [icon]="faFingerprint" slot="start"></fa-icon>
+          Eliminar huella antigua y registrar nueva
+        </ion-button>
+
         <!-- Divider -->
         <div class="divider">
           <span>o</span>

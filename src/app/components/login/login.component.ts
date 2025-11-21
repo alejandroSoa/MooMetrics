@@ -47,6 +47,7 @@ export class LoginComponent {
   isBiometricLoading: boolean = false;
   isBiometricAvailable: boolean = false;
   hasBiometricCredentials: boolean = false;
+  biometricError: boolean = false;
 
   constructor(
     private router: Router, 
@@ -169,6 +170,7 @@ export class LoginComponent {
     }
 
     this.isBiometricLoading = true;
+    this.biometricError = false;
 
     try {
       const success = await this.biometricService.authenticateWithBiometric();
@@ -180,9 +182,11 @@ export class LoginComponent {
         this.router.navigate(['/home']);
       } else {
         console.error('Biometric authentication failed');
+        this.biometricError = true;
       }
     } catch (error) {
       console.error('Error during biometric authentication:', error);
+      this.biometricError = true;
     } finally {
       this.isBiometricLoading = false;
     }
@@ -239,5 +243,30 @@ export class LoginComponent {
       !this.biometricService.isMobileDevice() || 
       this.biometricService.isMobileDevice()
     );
+  }
+
+  /**
+   * Elimina las credenciales biométricas antiguas y permite registrar nuevas
+   */
+  async removeOldBiometric(): Promise<void> {
+    try {
+      // Eliminar credenciales almacenadas
+      this.biometricService.removeBiometricCredentials();
+      
+      // Resetear estado
+      this.hasBiometricCredentials = false;
+      this.biometricError = false;
+      
+      console.log('Old biometric credentials removed');
+      
+      // Si hay email, ofrecer registrar nueva huella inmediatamente
+      if (this.email) {
+        setTimeout(() => {
+          this.registerBiometric();
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error removing old biometric credentials:', error);
+    }
   }
 }

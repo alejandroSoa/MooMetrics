@@ -251,31 +251,7 @@ export class LoginComponent {
     return this.isBiometricAvailable && this.biometricService.isMobileDevice();
   }
 
-  /**
-   * Elimina las credenciales biométricas antiguas y permite registrar nuevas
-   */
-  async removeOldBiometric(): Promise<void> {
-    try {
-      // Eliminar credenciales almacenadas
-      this.biometricService.removeBiometricCredentials();
-      this.removeSavedUserCredentials();
-      
-      // Resetear estado
-      this.hasBiometricCredentials = false;
-      this.biometricError = false;
-      
-      console.log('Old biometric credentials removed');
-      
-      // Si hay email, ofrecer registrar nueva huella inmediatamente
-      if (this.email) {
-        setTimeout(() => {
-          this.registerBiometric();
-        }, 500);
-      }
-    } catch (error) {
-      console.error('Error removing old biometric credentials:', error);
-    }
-  }
+
 
   /**
    * Guarda las credenciales del usuario para uso con autenticación biométrica

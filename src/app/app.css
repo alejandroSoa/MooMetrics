@@ -229,18 +229,29 @@ ion-content {
   font-size: 8px !important;
 }
 
-/* Logout Section */
-.logout-section {
-  margin-top: auto;
+/* Logout Container - Separación visual del resto de iconos */
+.logout-container {
+  margin-top: 30px;
+  position: relative;
+}
+
+.logout-container::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 1px;
+  background-color: #444;
 }
 
 .logout-icon {
-  background-color: #4a4a4a !important;
   transition: all 0.3s ease !important;
 }
 
 .logout-icon:hover {
-  background-color: #666 !important;
+  background-color: #f44336 !important;
   transform: translateY(-1px);
 }
 
@@ -342,4 +353,32 @@ ion-content {
 
 .logout-confirm-btn:hover {
   background-color: #666;
+}
+
+/* Media Queries para Dispositivos Móviles */
+@media (max-width: 768px) {
+  .logout-container {
+    margin-top: 20px;
+  }
+  
+  .logout-container::before {
+    top: -10px;
+  }
+  
+  /* Asegurar que el botón de logout sea fácilmente accesible en móviles */
+  .logout-icon {
+    min-height: 40px;
+    min-width: 40px;
+  }
+}
+
+@media (max-height: 600px) {
+  /* En pantallas de poca altura, reducir el espacio del logout */
+  .logout-container {
+    margin-top: 15px;
+  }
+  
+  .nav-icons {
+    gap: 15px;
+  }
 }

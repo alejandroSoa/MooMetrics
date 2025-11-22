@@ -42,6 +42,13 @@
             <fa-icon [icon]="faBell"></fa-icon>
           </a>
         </div>
+
+        <!-- Logout Icon in Normal Mode -->
+        <div class="nav-icon-container logout-container">
+          <a class="nav-icon logout-icon" (click)="showLogoutConfirmation()">
+            <fa-icon [icon]="faArrowRightFromBracket"></fa-icon>
+          </a>
+        </div>
       </div>
 
       <!-- Navigation Icons - Admin Mode -->
@@ -73,16 +80,16 @@
             <fa-icon [icon]="faWarehouse"></fa-icon>
           </a>
         </div>
-      </div>
 
-      <!-- Logout Icon -->
-      <div class="logout-section">
-        <div class="nav-icon-container">
+        <!-- Logout Icon in Admin Mode -->
+        <div class="nav-icon-container logout-container">
           <a class="nav-icon logout-icon" (click)="showLogoutConfirmation()">
             <fa-icon [icon]="faArrowRightFromBracket"></fa-icon>
           </a>
         </div>
       </div>
+
+
     </div>
 
     <!-- Main Content Area -->

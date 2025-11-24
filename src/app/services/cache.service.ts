@@ -31,36 +31,11 @@ export class CacheService {
   private readonly DEFAULT_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
   private readonly SHORT_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for dynamic data
   
-  // Network status tracking
-  private isOnlineSubject = new BehaviorSubject<boolean>(navigator.onLine);
-  public isOnline$ = this.isOnlineSubject.asObservable();
-
   constructor() {
-    this.initializeNetworkListener();
     this.cleanExpiredCache();
   }
 
-  /**
-   * Initialize network status listener
-   */
-  private initializeNetworkListener(): void {
-    window.addEventListener('online', () => {
-      console.log('🟢 Network: Online');
-      this.isOnlineSubject.next(true);
-    });
-    
-    window.addEventListener('offline', () => {
-      console.log('🔴 Network: Offline');
-      this.isOnlineSubject.next(false);
-    });
-  }
 
-  /**
-   * Get current network status
-   */
-  isOnline(): boolean {
-    return navigator.onLine;
-  }
 
   /**
    * Store data in cache
@@ -299,37 +274,25 @@ export class CacheService {
     
     if (cached) {
       // Return cached data immediately
-      console.log(`🚀 Serving from cache: ${key}`);
+      console.log(`📁 Cache hit: ${key}`);
       
-      // If online, fetch fresh data in background and update cache
-      if (this.isOnline()) {
-        networkCall().pipe(
-          tap(data => this.set(key, data, cacheDuration)),
-          catchError(error => {
-            console.warn(`Background fetch failed for ${key}:`, error);
-            return of(null);
-          })
-        ).subscribe();
-      }
+      // Fetch fresh data in background and update cache
+      networkCall().pipe(
+        tap(data => this.set(key, data, cacheDuration)),
+        catchError(error => {
+          // Silently handle background fetch errors
+          return of(null);
+        })
+      ).subscribe();
       
       return of(cached);
     }
     
-    // No cache, try network
-    if (this.isOnline()) {
-      console.log(`🌐 Fetching from network: ${key}`);
-      return networkCall().pipe(
-        tap(data => this.set(key, data, cacheDuration)),
-        catchError(error => {
-          console.error(`Network fetch failed for ${key}:`, error);
-          throw error;
-        })
-      );
-    }
-    
-    // Offline and no cache
-    console.error(`❌ No cache and offline for: ${key}`);
-    throw new Error(`No cached data available for ${key} and you're offline`);
+    // No cache, fetch from network
+    console.log(`🌐 Fetching from network: ${key}`);
+    return networkCall().pipe(
+      tap(data => this.set(key, data, cacheDuration))
+    );
   }
 
   /**
@@ -340,31 +303,18 @@ export class CacheService {
     networkCall: () => Observable<T>,
     cacheDuration: number = this.DEFAULT_CACHE_DURATION
   ): Observable<T> {
-    if (this.isOnline()) {
-      console.log(`🌐 Fetching from network (network-first): ${key}`);
-      return networkCall().pipe(
-        tap(data => this.set(key, data, cacheDuration)),
-        catchError(error => {
-          console.warn(`Network fetch failed, trying cache for ${key}:`, error);
-          const cached = this.get<T>(key);
-          if (cached) {
-            console.log(`📁 Fallback to cache: ${key}`);
-            return of(cached);
-          }
-          throw error;
-        })
-      );
-    }
-    
-    // Offline, try cache
-    const cached = this.get<T>(key);
-    if (cached) {
-      console.log(`📁 Serving from cache (offline): ${key}`);
-      return of(cached);
-    }
-    
-    console.error(`❌ No cache and offline for: ${key}`);
-    throw new Error(`No cached data available for ${key} and you're offline`);
+    console.log(`🌐 Fetching from network (network-first): ${key}`);
+    return networkCall().pipe(
+      tap(data => this.set(key, data, cacheDuration)),
+      catchError(error => {
+        const cached = this.get<T>(key);
+        if (cached) {
+          console.log(`📁 Fallback to cache: ${key}`);
+          return of(cached);
+        }
+        throw error;
+      })
+    );
   }
 
   /**
@@ -375,7 +325,6 @@ export class CacheService {
     totalSize: string;
     oldestEntry: string;
     newestEntry: string;
-    isOnline: boolean;
   } {
     const keys = Object.keys(localStorage);
     const cacheKeys = keys.filter(key => key.startsWith(this.CACHE_PREFIX));
@@ -406,8 +355,7 @@ export class CacheService {
       totalEntries: cacheKeys.length,
       totalSize: this.formatBytes(totalSize),
       oldestEntry: new Date(oldestTimestamp).toLocaleString(),
-      newestEntry: new Date(newestTimestamp).toLocaleString(),
-      isOnline: this.isOnline()
+      newestEntry: new Date(newestTimestamp).toLocaleString()
     };
   }
 

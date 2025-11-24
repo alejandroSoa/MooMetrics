@@ -7,8 +7,6 @@ import { StableService, Stable, StablesResponse } from '../../services/stable.se
 import { ChannelService, Channel, ChannelsResponse } from '../../services/channel.service';
 import { MessageService, Message, MessagesResponse, SendMessageRequest, MessageResponse } from '../../services/message.service';
 import { CowService, CowsListResponse, CowDetailResponse, InventoryResponse, EventsResponse, Cow } from '../../services/cow.service';
-import { CacheService } from '../../services/cache.service';
-import { NotificationService } from '../../services/notification.service';
 
 interface ChatMessage {
   user: string;
@@ -110,44 +108,16 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     private stableService: StableService,
     private channelService: ChannelService,
     private messageService: MessageService,
-    private cowService: CowService,
-    private cacheService: CacheService,
-    private notificationService: NotificationService
+    private cowService: CowService
   ) {}
 
   ngOnInit() {
     this.loadStables();
     this.checkMobileView();
-    this.setupNetworkMonitoring();
     window.addEventListener('resize', () => this.checkMobileView());
   }
   
-  /**
-   * Setup network status monitoring
-   */
-  setupNetworkMonitoring(): void {
-    let wasOffline = false;
-    
-    // Subscribe to online/offline status
-    this.cacheService.isOnline$.subscribe(isOnline => {
-      this.isOnline = isOnline;
-      
-      if (isOnline && wasOffline) {
-        console.log('🟢 Network restored - refreshing data');
-        this.notificationService.showOnlineNotification();
-        
-        // Refresh current data when coming back online
-        if (this.selectedChannel) {
-          this.loadMessages(this.selectedChannel);
-        }
-        wasOffline = false;
-      } else if (!isOnline && !wasOffline) {
-        console.log('🔴 Network lost - using cached data');
-        this.notificationService.showOfflineNotification();
-        wasOffline = true;
-      }
-    });
-  }
+
   
   ngAfterViewChecked() {
     if (this.shouldScrollToBottom) {

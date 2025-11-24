@@ -1,7 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CacheService } from '../../services/cache.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-cache-status',
@@ -11,9 +10,6 @@ import { Subscription } from 'rxjs';
     <div class="cache-status-container">
       <div class="cache-header">
         <h3>📦 Estado del Caché</h3>
-        <div class="connection-status" [class.online]="isOnline" [class.offline]="!isOnline">
-          {{ isOnline ? '🟢 En línea' : '🔴 Sin conexión' }}
-        </div>
       </div>
       
       <div class="cache-stats" *ngIf="cacheStats">
@@ -43,36 +39,14 @@ import { Subscription } from 'rxjs';
       <div class="cache-info">
         <p><strong>ℹ️ Información:</strong></p>
         <ul>
-          <li>Los datos se guardan automáticamente cuando tienes conexión</li>
-          <li>Cuando estés sin internet, verás la última información guardada</li>
-          <li>Los establos, canales, mensajes y datos de vacas se mantienen offline</li>
-          <li>Los mensajes nuevos se sincronizarán cuando recuperes la conexión</li>
+          <li>Los datos se guardan automáticamente para acceso rápido</li>
+          <li>Los establos, canales, mensajes y datos de vacas se mantienen guardados</li>
+          <li>La información se actualiza en segundo plano</li>
+          <li>Funciona como WhatsApp - siempre tienes tus datos disponibles</li>
         </ul>
       </div>
       
-      <div class="offline-features" *ngIf="!isOnline">
-        <h4>🔒 Funciones Offline Disponibles:</h4>
-        <div class="feature-list">
-          <div class="feature-item available">
-            ✅ Ver establos guardados
-          </div>
-          <div class="feature-item available">
-            ✅ Navegar por canales
-          </div>
-          <div class="feature-item available">
-            ✅ Leer mensajes anteriores
-          </div>
-          <div class="feature-item available">
-            ✅ Consultar datos de vacas
-          </div>
-          <div class="feature-item unavailable">
-            ❌ Enviar mensajes nuevos
-          </div>
-          <div class="feature-item unavailable">
-            ❌ Obtener datos actualizados
-          </div>
-        </div>
-      </div>
+
     </div>
   `,
   styles: [`
@@ -282,34 +256,15 @@ import { Subscription } from 'rxjs';
     }
   `]
 })
-export class CacheStatusComponent implements OnInit, OnDestroy {
-  isOnline = navigator.onLine;
+export class CacheStatusComponent implements OnInit {
   cacheStats: any = null;
   isRefreshing = false;
   isClearing = false;
-  private onlineSubscription: Subscription | null = null;
 
   constructor(private cacheService: CacheService) {}
 
   ngOnInit() {
     this.refreshStats();
-    
-    // Subscribe to online status changes
-    this.onlineSubscription = this.cacheService.isOnline$.subscribe(
-      isOnline => {
-        this.isOnline = isOnline;
-        if (isOnline) {
-          // Refresh stats when coming back online
-          setTimeout(() => this.refreshStats(), 1000);
-        }
-      }
-    );
-  }
-
-  ngOnDestroy() {
-    if (this.onlineSubscription) {
-      this.onlineSubscription.unsubscribe();
-    }
   }
 
   refreshStats() {

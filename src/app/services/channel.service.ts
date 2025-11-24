@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { CacheService } from './cache.service';
 import { environment } from '../../environments/environment';
 
 export interface Channel {
@@ -52,47 +54,87 @@ export interface UpdateChannelRequest {
 })
 export class ChannelService {
   private readonly API_URL = environment.apiUrl;
+  private readonly CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(
+    private http: HttpClient, 
+    private authService: AuthService,
+    private cacheService: CacheService
+  ) {}
 
   /**
-   * Get all channels for a specific stable
+   * Get all channels for a specific stable with cache support
    */
   getChannelsByStableId(stableId: number): Observable<ChannelsResponse> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<ChannelsResponse>(`${this.API_URL}/stables/${stableId}/channels`, { headers });
+    const networkCall = () => {
+      const headers = this.getAuthHeaders();
+      return this.http.get<ChannelsResponse>(`${this.API_URL}/stables/${stableId}/channels`, { headers });
+    };
+    
+    return this.cacheService.cacheFirst(
+      `channels_${stableId}`,
+      networkCall,
+      this.CACHE_DURATION
+    );
   }
 
   /**
-   * Get a specific channel by ID
+   * Get a specific channel by ID with cache support
    */
   getChannelById(channelId: number): Observable<ChannelResponse> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<ChannelResponse>(`${this.API_URL}/channels/${channelId}`, { headers });
+    const networkCall = () => {
+      const headers = this.getAuthHeaders();
+      return this.http.get<ChannelResponse>(`${this.API_URL}/channels/${channelId}`, { headers });
+    };
+    
+    return this.cacheService.cacheFirst(
+      `channel_${channelId}`,
+      networkCall,
+      this.CACHE_DURATION
+    );
   }
 
   /**
    * Create a new channel for a stable
+   * Clears relevant cache after creation
    */
   createChannel(channelData: CreateChannelRequest): Observable<ChannelResponse> {
     const headers = this.getAuthHeaders();
-    return this.http.post<ChannelResponse>(`${this.API_URL}/channels`, channelData, { headers });
+    return this.http.post<ChannelResponse>(`${this.API_URL}/channels`, channelData, { headers }).pipe(
+      tap(() => {
+        // Clear channels cache for this stable to refresh the list
+        this.cacheService.remove(`channels_${channelData.stableId}`);
+      })
+    );
   }
 
   /**
    * Update a channel
+   * Clears relevant cache after update
    */
   updateChannel(channelId: number, channelData: UpdateChannelRequest): Observable<ChannelResponse> {
     const headers = this.getAuthHeaders();
-    return this.http.put<ChannelResponse>(`${this.API_URL}/channels/${channelId}`, channelData, { headers });
+    return this.http.put<ChannelResponse>(`${this.API_URL}/channels/${channelId}`, channelData, { headers }).pipe(
+      tap(() => {
+        // Clear specific channel cache and related channels list
+        this.cacheService.remove(`channel_${channelId}`);
+      })
+    );
   }
 
   /**
    * Delete a channel
+   * Clears relevant cache after deletion
    */
   deleteChannel(channelId: number): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.delete(`${this.API_URL}/channels/${channelId}`, { headers });
+    return this.http.delete(`${this.API_URL}/channels/${channelId}`, { headers }).pipe(
+      tap(() => {
+        // Clear specific channel cache and messages
+        this.cacheService.remove(`channel_${channelId}`);
+        this.cacheService.remove(`messages_${channelId}`);
+      })
+    );
   }
 
   /**

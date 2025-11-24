@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { CacheService } from './cache.service';
 import { environment } from '../../environments/environment';
 
 export interface Stable {
@@ -37,23 +38,44 @@ export interface CreateStableRequest {
 })
 export class StableService {
   private readonly API_URL = environment.apiUrl;
+  private readonly CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(
+    private http: HttpClient, 
+    private authService: AuthService,
+    private cacheService: CacheService
+  ) {}
 
   /**
-   * Get all stables from the API
+   * Get all stables from the API with cache support
    */
   getStables(): Observable<StablesResponse> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<StablesResponse>(`${this.API_URL}/stables`, { headers });
+    const networkCall = () => {
+      const headers = this.getAuthHeaders();
+      return this.http.get<StablesResponse>(`${this.API_URL}/stables`, { headers });
+    };
+    
+    return this.cacheService.cacheFirst(
+      'stables',
+      networkCall,
+      this.CACHE_DURATION
+    );
   }
 
   /**
-   * Get a specific stable by ID
+   * Get a specific stable by ID with cache support
    */
   getStableById(id: number): Observable<StableResponse> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<StableResponse>(`${this.API_URL}/stables/${id}`, { headers });
+    const networkCall = () => {
+      const headers = this.getAuthHeaders();
+      return this.http.get<StableResponse>(`${this.API_URL}/stables/${id}`, { headers });
+    };
+    
+    return this.cacheService.cacheFirst(
+      `stable_${id}`,
+      networkCall,
+      this.CACHE_DURATION
+    );
   }
 
   /**

@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CacheStatusComponent } from '../cache-status/cache-status.component';
 
 @Component({
   selector: 'app-sw-test',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CacheStatusComponent],
   templateUrl: './sw-test.component.html',
   styleUrls: ['./sw-test.component.css']
 })

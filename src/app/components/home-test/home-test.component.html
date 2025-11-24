@@ -3,6 +3,13 @@
     <fa-icon [icon]="faArrowLeft"></fa-icon>
   </button>
   <h1>MooMetrics</h1>
+  
+  <!-- Network Status Indicator -->
+  <div class="network-status" [class.online]="isOnline" [class.offline]="!isOnline">
+    <span class="status-dot"></span>
+    <span class="status-text">{{ isOnline ? 'En línea' : 'Sin conexión' }}</span>
+    <span *ngIf="!isOnline" class="cache-indicator">📦 Datos offline</span>
+  </div>
 </div>
 
 <!-- Content Area -->

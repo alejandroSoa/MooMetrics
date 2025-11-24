@@ -83,7 +83,8 @@
   background-color: #e8e8e8;
   padding: 15px 30px;
   display: flex;
-  align-items: center; /* Solo centra verticalmente */
+  align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid #ddd;
 }
 
@@ -92,6 +93,64 @@
   font-weight: 600;
   margin: 0 0 0 8px; /* Espacio a la izquierda de la flecha */
   color: #333;
+  flex-grow: 1;
+}
+
+/* Network Status Indicator */
+.network-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.network-status.online {
+  background: rgba(76, 175, 80, 0.1);
+  color: #2e7d32;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.network-status.offline {
+  background: rgba(244, 67, 54, 0.1);
+  color: #c62828;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  animation: offlinePulse 2s infinite;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.network-status.online .status-dot {
+  background: #4caf50;
+}
+
+.network-status.offline .status-dot {
+  background: #f44336;
+}
+
+.cache-indicator {
+  background: rgba(255, 152, 0, 0.2);
+  color: #e65100;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  margin-left: 4px;
+}
+
+@keyframes offlinePulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
 } 
 
 /* Content Area */
@@ -383,7 +442,8 @@ html, body {
   .header {
     padding: 12px 16px;
     display: flex;
-    align-items: center; 
+    align-items: center;
+    justify-content: space-between;
     background-color: #e8e8e8;
     border-bottom: 1px solid #ddd;
     min-height: 48px;
@@ -394,6 +454,17 @@ html, body {
     font-weight: 600;
     margin: 0 0 0 8px;
     color: #333;
+    flex-grow: 1;
+  }
+  
+  .network-status {
+    min-width: 80px;
+    padding: 6px 8px;
+    font-size: 0.75rem;
+  }
+  
+  .cache-indicator {
+    display: none; /* Hide cache indicator text on mobile to save space */
   }
 
   .content-area {

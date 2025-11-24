@@ -9,10 +9,11 @@ import { faUsers, faBell, faSearch, faUserShield, faToggleOn, faToggleOff, faCha
 import { IonApp, IonToggle } from '@ionic/angular/standalone';
 import { AdminModeService } from './services/admin-mode.service';
 import { InstallPromptComponent } from './components/install-prompt/install-prompt.component';
+import { NotificationToastComponent } from './components/notification-toast/notification-toast.component';
 
 @Component({
   selector: 'app-root',
-  imports: [IonApp, CommonModule, FormsModule, FontAwesomeModule, RouterModule, InstallPromptComponent],
+  imports: [IonApp, CommonModule, FormsModule, FontAwesomeModule, RouterModule, InstallPromptComponent, NotificationToastComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

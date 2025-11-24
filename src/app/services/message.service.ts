@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { CacheService } from './cache.service';
 import { environment } from '../../environments/environment';
 
 export interface Message {
@@ -35,23 +37,42 @@ export interface SendMessageRequest {
 })
 export class MessageService {
   private readonly API_URL = environment.apiUrl;
+  private readonly CACHE_DURATION = 10 * 60 * 1000; // 10 minutes for messages
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(
+    private http: HttpClient, 
+    private authService: AuthService,
+    private cacheService: CacheService
+  ) {}
 
   /**
-   * Get all messages for a specific channel
+   * Get all messages for a specific channel with cache support
    */
   getMessagesByChannelId(channelId: number): Observable<MessagesResponse> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<MessagesResponse>(`${this.API_URL}/channels/${channelId}/messages`, { headers });
+    const networkCall = () => {
+      const headers = this.getAuthHeaders();
+      return this.http.get<MessagesResponse>(`${this.API_URL}/channels/${channelId}/messages`, { headers });
+    };
+    
+    return this.cacheService.cacheFirst(
+      `messages_${channelId}`,
+      networkCall,
+      this.CACHE_DURATION
+    );
   }
 
   /**
    * Send a new message to a channel
+   * Clears messages cache to refresh with new message
    */
   sendMessage(channelId: number, messageData: SendMessageRequest): Observable<MessageResponse> {
     const headers = this.getAuthHeaders();
-    return this.http.post<MessageResponse>(`${this.API_URL}/channels/${channelId}/messages`, messageData, { headers });
+    return this.http.post<MessageResponse>(`${this.API_URL}/channels/${channelId}/messages`, messageData, { headers }).pipe(
+      tap(() => {
+        // Clear messages cache for this channel to refresh with new message
+        this.cacheService.remove(`messages_${channelId}`);
+      })
+    );
   }
 
   /**

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
+import { CacheService } from './cache.service';
 
 // Interfaces para las respuestas de la API
 export interface Cow {
@@ -102,8 +103,10 @@ export interface EventsResponse {
 export class CowService {
   private baseUrl = '/api/v1'; // URL base de la API
   private mockCows: Cow[] = [];
+  private readonly CACHE_DURATION = 20 * 60 * 1000; // 20 minutes for cow data
+  private readonly SHORT_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for dynamic data
 
-  constructor() {
+  constructor(private cacheService: CacheService) {
     this.initializeMockData();
   }
 
@@ -151,151 +154,183 @@ export class CowService {
   }
 
   /**
-   * Get paginated list of cows for a specific stable
+   * Get paginated list of cows for a specific stable with cache support
    * API Route: GET /api/v1/stables/{stableId}/cows?page={page}&limit={limit}
    */
   getCowsByStableId(stableId: number, page: number = 1, limit: number = 7): Observable<CowsListResponse> {
     console.log(`🔗 API Call: GET ${this.baseUrl}/stables/${stableId}/cows?page=${page}&limit=${limit}`);
     
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const cowsOnPage = this.mockCows.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(this.mockCows.length / limit);
+    const networkCall = () => {
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const cowsOnPage = this.mockCows.slice(startIndex, endIndex);
+      const totalPages = Math.ceil(this.mockCows.length / limit);
 
-    const response: CowsListResponse = {
-      status: 'success',
-      message: 'Vacas obtenidas exitosamente',
-      data: {
-        cows: cowsOnPage,
-        pagination: {
-          currentPage: page,
-          totalPages: totalPages,
-          totalItems: this.mockCows.length,
-          itemsPerPage: limit
+      const response: CowsListResponse = {
+        status: 'success',
+        message: 'Vacas obtenidas exitosamente',
+        data: {
+          cows: cowsOnPage,
+          pagination: {
+            currentPage: page,
+            totalPages: totalPages,
+            totalItems: this.mockCows.length,
+            itemsPerPage: limit
+          }
         }
-      }
-    };
+      };
 
-    // Simulate API delay
-    return of(response).pipe(delay(300));
+      // Simulate API delay
+      return of(response).pipe(delay(300));
+    };
+    
+    return this.cacheService.cacheFirst(
+      `cows_${stableId}_${page}`,
+      networkCall,
+      this.CACHE_DURATION
+    );
   }
 
   /**
-   * Get detailed information of a specific cow
+   * Get detailed information of a specific cow with cache support
    * API Route: GET /api/v1/cows/{cowId}
    */
   getCowDetail(cowId: string): Observable<CowDetailResponse> {
     console.log(`🔗 API Call: GET ${this.baseUrl}/cows/${cowId}`);
     
-    const cow = this.mockCows.find(c => c.id === cowId);
-    
-    if (!cow) {
-      return of({
-        status: 'error',
-        message: `No se encontró la vaca con ID ${cowId}`,
-        data: {} as Cow
-      }).pipe(delay(200));
-    }
+    const networkCall = () => {
+      const cow = this.mockCows.find(c => c.id === cowId);
+      
+      if (!cow) {
+        return of({
+          status: 'error',
+          message: `No se encontró la vaca con ID ${cowId}`,
+          data: {} as Cow
+        }).pipe(delay(200));
+      }
 
-    const response: CowDetailResponse = {
-      status: 'success',
-      message: 'Información de la vaca obtenida exitosamente',
-      data: cow
+      const response: CowDetailResponse = {
+        status: 'success',
+        message: 'Información de la vaca obtenida exitosamente',
+        data: cow
+      };
+
+      // Simulate API delay
+      return of(response).pipe(delay(400));
     };
-
-    // Simulate API delay
-    return of(response).pipe(delay(400));
+    
+    return this.cacheService.cacheFirst(
+      `cow_detail_${cowId}`,
+      networkCall,
+      this.CACHE_DURATION
+    );
   }
 
   /**
-   * Get inventory report for a specific stable
+   * Get inventory report for a specific stable with cache support
    * API Route: GET /api/v1/stables/{stableId}/inventory
    */
   getInventoryByStableId(stableId: number): Observable<InventoryResponse> {
     console.log(`🔗 API Call: GET ${this.baseUrl}/stables/${stableId}/inventory`);
     
-    const stableCows = this.mockCows.filter(cow => cow.stableId === stableId);
+    const networkCall = () => {
+      const stableCows = this.mockCows.filter(cow => cow.stableId === stableId);
+      
+      // Calculate summary
+      const summary = {
+        totalCows: stableCows.length,
+        females: stableCows.filter(cow => cow.sex === 'F').length,
+        males: stableCows.filter(cow => cow.sex === 'M').length
+      };
+
+      // Calculate by breed
+      const breedCounts: { [key: string]: number } = {};
+      stableCows.forEach(cow => {
+        breedCounts[cow.breed] = (breedCounts[cow.breed] || 0) + 1;
+      });
+      const byBreed = Object.entries(breedCounts).map(([breed, count]) => ({ breed, count }));
+
+      // Mock age ranges
+      const byAge = [
+        { ageRange: '< 1 año', count: 45 },
+        { ageRange: '1-3 años', count: 89 },
+        { ageRange: '> 3 años', count: 111 }
+      ];
+
+      // Mock status
+      const byStatus = [
+        { status: 'En producción', count: 167 },
+        { status: 'Secas', count: 45 },
+        { status: 'Novillas', count: 33 }
+      ];
+
+      const response: InventoryResponse = {
+        status: 'success',
+        message: 'Inventario obtenido exitosamente',
+        data: {
+          stableName: 'MSD', // This should come from stable service
+          summary,
+          byBreed,
+          byAge,
+          byStatus
+        }
+      };
+
+      // Simulate API delay
+      return of(response).pipe(delay(500));
+    };
     
-    // Calculate summary
-    const summary = {
-      totalCows: stableCows.length,
-      females: stableCows.filter(cow => cow.sex === 'F').length,
-      males: stableCows.filter(cow => cow.sex === 'M').length
-    };
-
-    // Calculate by breed
-    const breedCounts: { [key: string]: number } = {};
-    stableCows.forEach(cow => {
-      breedCounts[cow.breed] = (breedCounts[cow.breed] || 0) + 1;
-    });
-    const byBreed = Object.entries(breedCounts).map(([breed, count]) => ({ breed, count }));
-
-    // Mock age ranges
-    const byAge = [
-      { ageRange: '< 1 año', count: 45 },
-      { ageRange: '1-3 años', count: 89 },
-      { ageRange: '> 3 años', count: 111 }
-    ];
-
-    // Mock status
-    const byStatus = [
-      { status: 'En producción', count: 167 },
-      { status: 'Secas', count: 45 },
-      { status: 'Novillas', count: 33 }
-    ];
-
-    const response: InventoryResponse = {
-      status: 'success',
-      message: 'Inventario obtenido exitosamente',
-      data: {
-        stableName: 'MSD', // This should come from stable service
-        summary,
-        byBreed,
-        byAge,
-        byStatus
-      }
-    };
-
-    // Simulate API delay
-    return of(response).pipe(delay(500));
+    return this.cacheService.cacheFirst(
+      `inventory_${stableId}`,
+      networkCall,
+      this.SHORT_CACHE_DURATION // Use shorter cache for dynamic data
+    );
   }
 
   /**
-   * Get events report for a specific stable
+   * Get events report for a specific stable with cache support
    * API Route: GET /api/v1/stables/{stableId}/events?period={period}
    */
   getEventsByStableId(stableId: number, period: string = 'last30days'): Observable<EventsResponse> {
     console.log(`🔗 API Call: GET ${this.baseUrl}/stables/${stableId}/events?period=${period}`);
     
-    const response: EventsResponse = {
-      status: 'success',
-      message: 'Reporte de eventos obtenido exitosamente',
-      data: {
-        stableName: 'MSD', // This should come from stable service
-        period: 'Últimos 30 días',
-        veterinaryEvents: [
-          { type: 'DNB (Do Not Breed)', count: 12 },
-          { type: 'Abortos (Abortions)', count: 3 },
-          { type: 'Diagnósticos (Diagnosis)', count: 45 },
-          { type: 'Chequeos embarazo (Pregchecks)', count: 67 }
-        ],
-        reproductiveEvents: [
-          { type: 'Nacimientos (Births)', count: 23 },
-          { type: 'Cruces (Breedings)', count: 34 },
-          { type: 'Secado (Dryoffs)', count: 18 },
-          { type: 'Partos frescos (Freshs)', count: 21 }
-        ],
-        managementEvents: [
-          { type: 'Descartes (Culls)', count: 8 },
-          { type: 'Tratamiento cascos (Hoofs)', count: 15 },
-          { type: 'Movimientos (Moves)', count: 29 }
-        ],
-        totalEvents: 275
-      }
-    };
+    const networkCall = () => {
+      const response: EventsResponse = {
+        status: 'success',
+        message: 'Reporte de eventos obtenido exitosamente',
+        data: {
+          stableName: 'MSD', // This should come from stable service
+          period: 'Últimos 30 días',
+          veterinaryEvents: [
+            { type: 'DNB (Do Not Breed)', count: 12 },
+            { type: 'Abortos (Abortions)', count: 3 },
+            { type: 'Diagnósticos (Diagnosis)', count: 45 },
+            { type: 'Chequeos embarazo (Pregchecks)', count: 67 }
+          ],
+          reproductiveEvents: [
+            { type: 'Nacimientos (Births)', count: 23 },
+            { type: 'Cruces (Breedings)', count: 34 },
+            { type: 'Secado (Dryoffs)', count: 18 },
+            { type: 'Partos frescos (Freshs)', count: 21 }
+          ],
+          managementEvents: [
+            { type: 'Descartes (Culls)', count: 8 },
+            { type: 'Tratamiento cascos (Hoofs)', count: 15 },
+            { type: 'Movimientos (Moves)', count: 29 }
+          ],
+          totalEvents: 275
+        }
+      };
 
-    // Simulate API delay
-    return of(response).pipe(delay(600));
+      // Simulate API delay
+      return of(response).pipe(delay(600));
+    };
+    
+    return this.cacheService.cacheFirst(
+      `events_${stableId}_${period}`,
+      networkCall,
+      this.SHORT_CACHE_DURATION // Use shorter cache for dynamic data
+    );
   }
 
   /**

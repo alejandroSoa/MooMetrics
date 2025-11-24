@@ -469,39 +469,7 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
       }, 500);
     }
   }
-
-  /**
-   * Show help message
-   */
-  showHelpMessage(): void {
-    if (!this.selectedChannel) return;
-    
-    const helpMessage: ChatMessage = {
-      user: 'Sistema 💡',
-      message: '🆘 Ayuda de MooMetrics:\n\nComandos disponibles:\n• #bot - Activar asistente virtual\n• #help - Mostrar esta ayuda\n• #clear - Limpiar historial del chat\n\nPara usar un comando, simplemente escribe # y selecciona una opción.',
-      isBot: true
-    };
-    
-    this.selectedChannel.chatMessages.push(helpMessage);
-  }
-
-  /**
-   * Clear chat messages
-   */
-  clearChat(): void {
-    if (!this.selectedChannel) return;
-    
-    this.selectedChannel.chatMessages = [];
-    
-    const clearMessage: ChatMessage = {
-      user: 'Sistema 🧹',
-      message: 'Chat limpiado correctamente.',
-      isBot: true
-    };
-    
-    this.selectedChannel.chatMessages.push(clearMessage);
-  }
-
+  
   /**
    * Send a message to the current channel
    */

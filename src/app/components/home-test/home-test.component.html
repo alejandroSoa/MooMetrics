@@ -61,8 +61,20 @@
   <div class="chat-area" [class.mobile-hidden]="!showChat">
     <!-- Chat Header -->
     <div class="chat-header">
-      <h2 *ngIf="selectedChannel">{{ selectedChannel.name }}</h2>
-      <h2 *ngIf="!selectedChannel">Selecciona un canal</h2>
+      <div *ngIf="!botMode">
+        <h2 *ngIf="selectedChannel">{{ selectedChannel.name }}</h2>
+        <h2 *ngIf="!selectedChannel">Selecciona un canal</h2>
+      </div>
+      <div *ngIf="botMode" class="bot-mode-header">
+        <div class="bot-mode-info">
+          <span class="bot-mode-icon">🤖</span>
+          <span class="bot-mode-title">Conversación con MooBot</span>
+          <span class="bot-mode-subtitle">(Modo privado - no se guarda)</span>
+        </div>
+        <button class="exit-bot-button" (click)="exitBotMode()" title="Salir del modo bot">
+          <span>✕</span>
+        </button>
+      </div>
     </div>
     
     <!-- No channel selected -->
@@ -78,7 +90,7 @@
       </div>
       
       <!-- Messages -->
-      <div *ngIf="!selectedChannel.isLoadingMessages" class="messages-container">
+      <div *ngIf="!selectedChannel.isLoadingMessages" class="messages-container" #messagesContainer>
         <div *ngFor="let message of currentChatMessages" class="message" [class.bot-message]="message.isBot">
           <div class="message-avatar">
             <div class="avatar-circle">
@@ -95,12 +107,65 @@
       </div>
     </div>
     
+    <!-- Bot Options Menu -->
+    <div *ngIf="botMode && showBotMenu" class="bot-menu-container">
+      <div class="bot-menu">
+        <div class="bot-menu-header">
+          <span class="bot-icon">🤖</span>
+          <span class="bot-title">MooBot - Opciones</span>
+        </div>
+        <div class="bot-options">
+          <button 
+            *ngFor="let option of botOptions" 
+            class="bot-option"
+            (click)="selectBotOption(option)">
+            {{ option.label }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Access Buttons for Bot Mode -->
+    <div *ngIf="botMode" class="quick-access-container">
+      <div class="quick-access-header">
+        <span class="quick-access-title">Acceso Rápido:</span>
+      </div>
+      <div class="quick-access-buttons">
+        <button 
+          *ngFor="let button of quickAccessButtons" 
+          class="quick-access-btn"
+          (click)="selectQuickAction(button)"
+          [title]="button.label">
+          <span class="quick-btn-icon">{{ button.icon }}</span>
+          <span class="quick-btn-label">{{ button.label }}</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Message Input -->
     <div *ngIf="selectedChannel" class="message-input-container">
+      <!-- Commands Dropdown -->
+      <div *ngIf="showCommands" class="commands-dropdown">
+        <div class="commands-header">
+          <span class="commands-icon">#</span>
+          <span class="commands-title">Comandos disponibles</span>
+        </div>
+        <div class="commands-list">
+          <div 
+            *ngFor="let command of availableCommands" 
+            class="command-item"
+            (click)="executeCommand(command.name)">
+            <span class="command-name">{{ command.name }}</span>
+            <span class="command-description">{{ command.description }}</span>
+          </div>
+        </div>
+      </div>
+      
       <input 
         type="text" 
-        placeholder="Type your message here..." 
+        placeholder="Escribe tu mensaje aquí... (usa # para comandos)" 
         [(ngModel)]="messageInput"
+        (input)="onInputChange()"
         (keyup.enter)="sendMessage()"
         class="message-input">
       <button (click)="sendMessage()" class="send-button" [disabled]="!messageInput.trim()">

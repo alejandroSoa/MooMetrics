@@ -9,6 +9,7 @@ import { faUsers, faBell, faSearch, faUserShield, faToggleOn, faToggleOff, faCha
 import { IonApp, IonToggle } from '@ionic/angular/standalone';
 import { AdminModeService } from './services/admin-mode.service';
 import { InstallPromptComponent } from './components/install-prompt/install-prompt.component';
+import { FmcService } from './services/fmc.service';
 
 @Component({
   selector: 'app-root',
@@ -31,8 +32,11 @@ export class App implements OnInit {
   isAdminMode = signal(false);
   showLogoutConfirm = signal(false);
   private previousAdminMode: boolean | null = null;
-
-  constructor(private router: Router, private adminModeService: AdminModeService) {}
+  constructor(
+    private router: Router,
+    private adminModeService: AdminModeService,
+    private fmcService: FmcService
+  ) {}
 
   ngOnInit() {
     this.currentUrl.set(this.router.url);
@@ -62,6 +66,8 @@ export class App implements OnInit {
       // Update previous state
       this.previousAdminMode = isAdmin;
     });
+
+    this.fmcService.installFCMServiceWorker();
   }
 
   isActive(path: string): boolean {

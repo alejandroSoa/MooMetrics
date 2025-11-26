@@ -7,6 +7,7 @@ import { environment } from '../../environments/environment';
 export interface LoginRequest {
   email: string;
   password: string;
+  fcmToken?: string;
 }
 
 export interface LoginResponse {
@@ -61,7 +62,11 @@ export class AuthService {
    * Login user with email and password
    */
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, credentials)
+    // Add fcmToken from localStorage (if available) to the login payload
+    const storedFcm = localStorage.getItem('pushToken');
+    const payload: LoginRequest = storedFcm ? { ...credentials, fcmToken: storedFcm } : credentials;
+
+    return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, payload)
       .pipe(
         map(response => {
           if (response.status === 'success' && response.data.token) {

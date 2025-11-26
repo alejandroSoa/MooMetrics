@@ -16,43 +16,30 @@ export class FmcService {
     }
 
     async installFCMServiceWorker() {
-
-        const registrations: ReadonlyArray<ServiceWorkerRegistration> =
-        await navigator.serviceWorker.getRegistrations();
-
-        if (registrations.length === 0) {
-            let swRegistered = await this.registerSw();
-            if (swRegistered !== null) {
+        try {
+            // Registrar o actualizar el Service Worker de Firebase Messaging
+            const registration = await this.registerSw();
+            
+            if (registration) {
+                // Esperar a que el Service Worker esté listo
                 await navigator.serviceWorker.ready;
-                this.requestNotificationPermission(swRegistered);
+                // Pedir permiso para notificaciones
+                await this.requestNotificationPermission(registration);
             }
-        } else {
-            let registration = registrations.find(
-                (reg) => reg.active && reg.active.scriptURL.includes('firebase-messaging')
-            );
-            if (!!registration) {
-                await navigator.serviceWorker.ready;
-                this.requestNotificationPermission(registration);
-            } else {
-                let swRegistered = await this.registerSw();
-                if (swRegistered !== null) {
-                    await navigator.serviceWorker.ready;
-                    this.requestNotificationPermission(swRegistered);
-            }
+        } catch (error) {
+            console.error('Error installing FCM Service Worker:', error);
         }
-    }
     }
 
     async registerSw(): Promise<ServiceWorkerRegistration | null> {
         if ('serviceWorker' in navigator) {
             try {
-                const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', );
-                if (!!registration) {
-                    return registration;
-                } else {
-                    return null;
-                }
+                console.log('Registrando Service Worker: /firebase-messaging-sw.js');
+                const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                console.log('Service Worker registrado exitosamente:', registration);
+                return registration || null;
             } catch (error) {
+                console.error('Error registrando Service Worker:', error);
                 return null;
             }
         } else {
@@ -80,16 +67,20 @@ export class FmcService {
 
     async getFcmToken(registration: ServiceWorkerRegistration) {
         try {
+            console.log('Obteniendo token FCM con registro:', registration.scope);
             const token = await getToken(this.messaging, {
                 vapidKey: environment.vapidKey,
                 serviceWorkerRegistration: registration,
             });
             if (token) {
+                console.log('Token obtenido:', token);
                 this.saveNotificationToken(token);
             } else {
-                console.warn('No registration token available. Request permission to generate one.');
+                console.warn('No se obtuvo token FCM.');
             }
-        } catch (error) {}
+        } catch (error) {
+            console.error('Error obteniendo token FCM:', error);
+        }
     }
 
     saveNotificationToken(token: string) {

@@ -320,6 +320,42 @@
   font-size: 14px;
 }
 
+/* Cow Actions */
+.cow-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.copy-cow-name-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.copy-cow-name-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.copy-cow-name-btn:active {
+  transform: translateY(0);
+}
+
+.copy-cow-name-btn fa-icon {
+  font-size: 11px;
+}
+
 /* Message Input */
 .message-input-container {
   padding: 20px 30px;
@@ -622,6 +658,17 @@ html, body {
     min-height: 32px;
     padding: 0;
     flex-shrink: 0;
+  }
+
+  .copy-cow-name-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    gap: 4px;
+    border-radius: 4px;
+  }
+
+  .copy-cow-name-btn fa-icon {
+    font-size: 10px;
   }
 }
 

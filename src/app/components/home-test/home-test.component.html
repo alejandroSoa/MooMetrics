@@ -102,6 +102,15 @@
               <span class="username">{{ message.user }}</span>
             </div>
             <div class="message-text">{{ message.message }}</div>
+            <div *ngIf="message.isCowInfo && message.cowName" class="cow-actions">
+              <button 
+                class="copy-cow-name-btn" 
+                (click)="copyCowName(message.cowName!)"
+                title="Copiar nombre de la vaca">
+                <fa-icon [icon]="faCopy"></fa-icon>
+                <span>Copiar nombre</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

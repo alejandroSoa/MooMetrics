@@ -48,6 +48,7 @@ export class LoginComponent {
   isBiometricAvailable: boolean = false;
   hasBiometricCredentials: boolean = false;
   biometricError: boolean = false;
+  errorMessage: string = '';
 
   constructor(
     private router: Router, 
@@ -64,6 +65,7 @@ export class LoginComponent {
     }
 
     this.isLoading = true;
+    this.errorMessage = ''; // Clear previous error message
     
     const credentials = {
       email: this.email,
@@ -87,7 +89,13 @@ export class LoginComponent {
       error: (error) => {
         console.error('Login failed:', error);
         this.isLoading = false;
-        // Here you can add user-friendly error handling
+        
+        // Check if it's a 401 error and extract the message
+        if (error.status === 401 && error.error?.message) {
+          this.errorMessage = error.error.message;
+        } else {
+          this.errorMessage = 'Error de autenticación. Verifica tus credenciales.';
+        }
       }
     });
   }
@@ -102,6 +110,14 @@ export class LoginComponent {
 
   isFormValid(): boolean {
     return !!this.email?.trim() && !!this.password?.trim();
+  }
+
+  onEmailChange() {
+    this.errorMessage = ''; // Clear error when user types
+  }
+
+  onPasswordChange() {
+    this.errorMessage = ''; // Clear error when user types
   }
 
   /**

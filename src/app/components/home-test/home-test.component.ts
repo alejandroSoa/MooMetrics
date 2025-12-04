@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faUsers, faBell, faSearch, faChevronLeft, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faBell, faSearch, faChevronLeft, faArrowLeft, faCopy } from '@fortawesome/free-solid-svg-icons';
 import { StableService, Stable, StablesResponse } from '../../services/stable.service';
 import { ChannelService, Channel, ChannelsResponse } from '../../services/channel.service';
 import { MessageService, Message, MessagesResponse, SendMessageRequest, MessageResponse } from '../../services/message.service';
@@ -13,6 +13,8 @@ interface ChatMessage {
   user: string;
   message: string;
   isBot?: boolean;
+  isCowInfo?: boolean;
+  cowName?: string;
 }
 
 interface ChannelWithMessages extends Channel {
@@ -45,6 +47,7 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
   faSearch = faSearch;
   faChevronLeft = faChevronLeft;
   faArrowLeft = faArrowLeft;
+  faCopy = faCopy;
   
   // Auto-scroll control
   private shouldScrollToBottom = false;
@@ -753,14 +756,9 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
         this.botMessages.pop();
 
         const currentPageCows = this.getCurrentPageCows();
-        const listMessage = this.generateCowListMessage(currentPageCows, page);
-        const botMessage: ChatMessage = {
-          user: 'MooBot 🤖',
-          message: listMessage,
-          isBot: true
-        };
+        const cowMessages = this.generateCowListMessages(currentPageCows, page);
 
-        this.botMessages.push(botMessage);
+        this.botMessages.push(...cowMessages);
         this.triggerScrollToBottom();
         } else {
           this.botMessages.pop(); // Remove loading message
@@ -803,46 +801,60 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
    */
   showCurrentPage(): void {
     const currentPageCows = this.getCurrentPageCows();
-    const listMessage = this.generateCowListMessage(currentPageCows, this.currentPage);
+    const cowMessages = this.generateCowListMessages(currentPageCows, this.currentPage);
     
-    const botMessage: ChatMessage = {
-      user: 'MooBot 🤖',
-      message: listMessage,
-      isBot: true
-    };
-
-    this.botMessages.push(botMessage);
+    // Add all messages to the bot messages array
+    this.botMessages.push(...cowMessages);
     this.triggerScrollToBottom();
   }
 
   /**
-   * Generate cow list message from API response
+   * Generate cow list messages from API response
    */
-  generateCowListMessage(cows: any[], currentPage: number): string {
-    let message = `🐄 Lista de vacas (Página ${currentPage} de ${this.totalPages}):\n\n`;
+  generateCowListMessages(cows: any[], currentPage: number): ChatMessage[] {
+    const messages: ChatMessage[] = [];
+    
+    // Header message
+    const headerMessage: ChatMessage = {
+      user: 'MooBot 🤖',
+      message: `🐄 Lista de vacas (Página ${currentPage} de ${this.totalPages}):`,
+      isBot: true
+    };
+    messages.push(headerMessage);
 
+    // Individual cow messages with copy button
     cows.forEach(cow => {
-      message += `• ID: ${cow.id}\n`;
-      message += `  Nombre: ${cow.name}\n`;
-      message += `  Raza: ${cow.breed}\n`;
-      message += `  Sexo: ${cow.sex}\n`;
-      message += `  Fecha nacimiento: ${this.formatDate(cow.birthDate)}\n\n`;
+      const cowMessage: ChatMessage = {
+        user: 'MooBot 🤖',
+        message: `Nombre: ${cow.name}\nRaza: ${cow.breed}\nSexo: ${cow.sex}\nFecha nacimiento: ${this.formatDate(cow.birthDate)}`,
+        isBot: true,
+        isCowInfo: true,
+        cowName: cow.name
+      };
+      messages.push(cowMessage);
     });
 
-    // Add navigation instructions
-    message += `📝 Comandos disponibles:\n`;
+    // Navigation instructions message
+    let navMessage = `📝 Comandos disponibles:\n`;
     if (currentPage > 1) {
-      message += `• "anterior" - Página anterior\n`;
+      navMessage += `• "anterior" - Página anterior\n`;
     }
     if (currentPage < this.totalPages) {
-      message += `• "siguiente" - Página siguiente\n`;
+      navMessage += `• "siguiente" - Página siguiente\n`;
     }
     if (this.totalPages > 1) {
-      message += `• "pagina X" o "página X" - Ir a página específica (ej: pagina 2)\n`;
+      navMessage += `• "pagina X" o "página X" - Ir a página específica (ej: pagina 2)\n`;
     }
-    message += `• "salir" - Volver al menú principal`;
+    navMessage += `• "salir" - Volver al menú principal`;
 
-    return message;
+    const navChatMessage: ChatMessage = {
+      user: 'MooBot 🤖',
+      message: navMessage,
+      isBot: true
+    };
+    messages.push(navChatMessage);
+
+    return messages;
   }
 
   
@@ -1211,6 +1223,46 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     this.isMobileView = window.innerWidth <= 768;
     if (!this.isMobileView) {
       this.showChat = false;
+    }
+  }
+
+  /**
+   * Copy cow name to clipboard
+   */
+  async copyCowName(cowName: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(cowName);
+      
+      // Show a temporary confirmation message
+      const confirmationMessage: ChatMessage = {
+        user: 'Sistema',
+        message: `✅ Nombre copiado: "${cowName}"`,
+        isBot: true
+      };
+      
+      this.botMessages.push(confirmationMessage);
+      this.triggerScrollToBottom();
+      
+      // Remove the confirmation message after 3 seconds
+      setTimeout(() => {
+        const index = this.botMessages.indexOf(confirmationMessage);
+        if (index > -1) {
+          this.botMessages.splice(index, 1);
+        }
+      }, 3000);
+      
+    } catch (err) {
+      console.error('Error copying to clipboard:', err);
+      
+      // Fallback confirmation message
+      const errorMessage: ChatMessage = {
+        user: 'Sistema',
+        message: `❌ No se pudo copiar el nombre. Nombre de la vaca: ${cowName}`,
+        isBot: true
+      };
+      
+      this.botMessages.push(errorMessage);
+      this.triggerScrollToBottom();
     }
   }
 }

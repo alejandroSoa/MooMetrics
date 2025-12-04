@@ -21,6 +21,7 @@
             [(ngModel)]="email" 
             name="email"
             placeholder="tu@email.com"
+            (ionInput)="onEmailChange()"
             required>
           </ion-input>
         </ion-item>
@@ -33,6 +34,7 @@
             [(ngModel)]="password" 
             name="password"
             placeholder="Tu contraseña"
+            (ionInput)="onPasswordChange()"
             required>
           </ion-input>
           <ion-button 
@@ -84,7 +86,10 @@
           {{ getBiometricSetupText() }}
         </ion-button>
 
-
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
 
         <!-- Divider -->
         <div class="divider">

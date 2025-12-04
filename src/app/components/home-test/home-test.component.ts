@@ -711,20 +711,21 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     this.triggerScrollToBottom();
     
     // Call API service via chatbot endpoint
-    this.chatbotService.getCowList(1).subscribe({
+    this.chatbotService.getCowList(this.stables[this.selectedStableIndex].id).subscribe({
       next: (response: any) => {
       this.isLoadingCows = false;
 
       if (response.status === 'success') {
 
         this.cowsData = response.data.cows;
-        this.totalPages = 1; // Por ahora no hay paginación
+        this.totalPages = Math.ceil(this.cowsData.length / this.itemsPerPage);
         this.showCowList = true;
 
         // Remove loading message
         this.botMessages.pop();
 
-        const listMessage = this.generateCowListMessage(response.data.cows);
+        const currentPageCows = this.getCurrentPageCows();
+        const listMessage = this.generateCowListMessage(currentPageCows, page);
         const botMessage: ChatMessage = {
           user: 'MooBot 🤖',
           message: listMessage,
@@ -761,10 +762,36 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
   }
   
   /**
+   * Get cows for current page
+   */
+  getCurrentPageCows(): any[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.cowsData.slice(startIndex, endIndex);
+  }
+
+  /**
+   * Show current page of cows
+   */
+  showCurrentPage(): void {
+    const currentPageCows = this.getCurrentPageCows();
+    const listMessage = this.generateCowListMessage(currentPageCows, this.currentPage);
+    
+    const botMessage: ChatMessage = {
+      user: 'MooBot 🤖',
+      message: listMessage,
+      isBot: true
+    };
+
+    this.botMessages.push(botMessage);
+    this.triggerScrollToBottom();
+  }
+
+  /**
    * Generate cow list message from API response
    */
-  generateCowListMessage(cows: any[]): string {
-    let message = "🐄 Lista de vacas:\n\n";
+  generateCowListMessage(cows: any[], currentPage: number): string {
+    let message = `🐄 Lista de vacas (Página ${currentPage} de ${this.totalPages}):\n\n`;
 
     cows.forEach(cow => {
       message += `• ID: ${cow.id}\n`;
@@ -773,6 +800,20 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
       message += `  Sexo: ${cow.sex}\n`;
       message += `  Fecha nacimiento: ${cow.birthDate}\n\n`;
     });
+
+    // Add navigation instructions
+    message += `📝 Comandos disponibles:\n`;
+    if (currentPage > 1) {
+      message += `• "anterior" - Página anterior\n`;
+    }
+    if (currentPage < this.totalPages) {
+      message += `• "siguiente" - Página siguiente\n`;
+    }
+    if (this.totalPages > 1) {
+      message += `• "página X" - Ir a página específica\n`;
+    }
+    message += `• "PKY###" - Ver detalles de una vaca\n`;
+    message += `• "salir" - Volver al menú principal`;
 
     return message;
   }
@@ -785,15 +826,18 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     let botResponse = '';
     
     if (input === 'siguiente' && this.currentPage < this.totalPages) {
-      this.loadCowsList(this.currentPage + 1);
+      this.currentPage++;
+      this.showCurrentPage();
       return; // Exit early
     } else if (input === 'anterior' && this.currentPage > 1) {
-      this.loadCowsList(this.currentPage - 1);
+      this.currentPage--;
+      this.showCurrentPage();
       return; // Exit early
     } else if (input.startsWith('página ')) {
       const pageNum = parseInt(input.replace('página ', ''));
       if (pageNum >= 1 && pageNum <= this.totalPages) {
-        this.loadCowsList(pageNum);
+        this.currentPage = pageNum;
+        this.showCurrentPage();
         return; // Exit early
       } else {
         botResponse = `❌ Página no válida. Por favor ingresa un número entre 1 y ${this.totalPages}.`;

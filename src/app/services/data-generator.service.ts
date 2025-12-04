@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 
 export interface DataGeneratorRequest {
@@ -22,7 +23,8 @@ export class DataGeneratorService {
   private readonly API_URL = environment.apiUrl;
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private authService: AuthService
   ) { }
 
   /**
@@ -35,7 +37,7 @@ export class DataGeneratorService {
       endDate
     };
 
-    const headers = this.getBasicHeaders();
+    const headers = this.getAuthHeaders();
     return this.http.post<DataGeneratorResponse>(`${this.API_URL}/data-generator/inventory`, payload, { headers });
   }
 
@@ -49,7 +51,7 @@ export class DataGeneratorService {
       endDate
     };
 
-    const headers = this.getBasicHeaders();
+    const headers = this.getAuthHeaders();
     return this.http.post<DataGeneratorResponse>(`${this.API_URL}/data-generator/events`, payload, { headers });
   }
 
@@ -122,10 +124,12 @@ export class DataGeneratorService {
   }
 
   /**
-   * Get basic headers without authentication (data-generator endpoints don't require auth)
+   * Get authentication headers with bearer token
    */
-  private getBasicHeaders(): HttpHeaders {
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
     return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     });
   }

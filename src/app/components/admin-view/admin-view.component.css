@@ -393,4 +393,22 @@
   .step-title {
     font-size: 1rem;
   }
+
+  /* Mobile button layout */
+  .action-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .process-btn,
+  .delete-btn {
+    width: 100%;
+    flex: none;
+  }
+  
+  .clear-btn {
+    width: 100%;
+    flex: none;
+    min-width: unset;
+  }
 }

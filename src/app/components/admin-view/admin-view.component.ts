@@ -21,7 +21,7 @@ import {
   IonProgressBar
 } from '@ionic/angular/standalone';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faDatabase, faCalendarAlt, faPlay, faCheckCircle, faTimesCircle, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faDatabase, faCalendarAlt, faPlay, faCheckCircle, faTimesCircle, faSpinner, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { StableService, Stable, StablesResponse } from '../../services/stable.service';
 import { DataGeneratorService } from '../../services/data-generator.service';
 
@@ -61,6 +61,11 @@ export class AdminViewComponent implements OnInit {
   faCheckCircle = faCheckCircle;
   faTimesCircle = faTimesCircle;
   faSpinner = faSpinner;
+  faPlus = faPlus;
+  faTrash = faTrash;
+
+  // Operation mode
+  operationMode: 'insert' | 'delete' = 'insert';
 
   // Stables data
   stables: Stable[] = [];
@@ -133,13 +138,49 @@ export class AdminViewComponent implements OnInit {
   }
 
   /**
-   * Process data insertion following the required flow
+   * Toggle operation mode between insert and delete
+   */
+  toggleOperationMode() {
+    this.operationMode = this.operationMode === 'insert' ? 'delete' : 'insert';
+    this.clearForm();
+  }
+
+  /**
+   * Get current operation text
+   */
+  getOperationText(): string {
+    return this.operationMode === 'insert' ? 'Inserción' : 'Eliminación';
+  }
+
+  /**
+   * Get current button text
+   */
+  getButtonText(): string {
+    if (this.isProcessing) {
+      return 'Procesando...';
+    }
+    return this.operationMode === 'insert' ? 'Iniciar Inserción' : 'Iniciar Eliminación';
+  }
+
+  /**
+   * Process data operation (insert or delete)
    */
   processDataInsertion() {
     if (!this.isFormValid()) {
       return;
     }
 
+    if (this.operationMode === 'insert') {
+      this.processInsert();
+    } else {
+      this.processDelete();
+    }
+  }
+
+  /**
+   * Process data insertion following the required flow
+   */
+  private processInsert() {
     this.isProcessing = true;
     this.currentStep = 'inventory';
     this.inventoryResult = null;
@@ -184,6 +225,53 @@ export class AdminViewComponent implements OnInit {
   }
 
   /**
+   * Process data deletion following the required flow (events first, then inventory)
+   */
+  private processDelete() {
+    this.isProcessing = true;
+    this.currentStep = 'events';
+    this.inventoryResult = null;
+    this.eventsResult = null;
+    this.processError = '';
+    this.showResults = false;
+
+    const selectedStable = this.getSelectedStable();
+    if (!selectedStable) return;
+
+    this.dataGeneratorService.processDataDeletion(
+      selectedStable.id,
+      this.startDate,
+      this.endDate
+    ).subscribe({
+      next: (result) => {
+        this.inventoryResult = result.inventory;
+        this.eventsResult = result.events;
+        
+        if (result.success) {
+          this.currentStep = 'completed';
+        } else {
+          this.currentStep = 'idle';
+          if (result.events.status === 'error') {
+            this.processError = result.events.message;
+          } else if (result.inventory.status === 'error') {
+            this.processError = result.inventory.message;
+          }
+        }
+        
+        this.isProcessing = false;
+        this.showResults = true;
+      },
+      error: (error) => {
+        console.error('Error in data deletion process:', error);
+        this.processError = 'Error inesperado durante el proceso de eliminación';
+        this.currentStep = 'idle';
+        this.isProcessing = false;
+        this.showResults = true;
+      }
+    });
+  }
+
+  /**
    * Check if form has any data
    */
   hasFormData(): boolean {
@@ -191,10 +279,17 @@ export class AdminViewComponent implements OnInit {
   }
 
   /**
-   * Clear form data only
+   * Clear form data and results
    */
   clearForm() {
     this.selectedStableId = null;
+    
+    // Clear results and process state
+    this.currentStep = 'idle';
+    this.inventoryResult = null;
+    this.eventsResult = null;
+    this.processError = '';
+    this.showResults = false;
     
     // Reset dates to current month
     const now = new Date();
@@ -239,14 +334,28 @@ export class AdminViewComponent implements OnInit {
     }
 
     if (this.isProcessing) {
-      if (step === 'inventory' && this.currentStep === 'inventory') {
-        return 'processing';
-      }
-      if (step === 'events' && this.currentStep === 'events') {
-        return 'processing';
-      }
-      if (step === 'events' && this.currentStep === 'inventory') {
-        return 'pending';
+      if (this.operationMode === 'insert') {
+        // Insert mode: inventory first, then events
+        if (step === 'inventory' && this.currentStep === 'inventory') {
+          return 'processing';
+        }
+        if (step === 'events' && this.currentStep === 'events') {
+          return 'processing';
+        }
+        if (step === 'events' && this.currentStep === 'inventory') {
+          return 'pending';
+        }
+      } else {
+        // Delete mode: events first, then inventory
+        if (step === 'events' && this.currentStep === 'events') {
+          return 'processing';
+        }
+        if (step === 'inventory' && this.currentStep === 'inventory') {
+          return 'processing';
+        }
+        if (step === 'inventory' && this.currentStep === 'events') {
+          return 'pending';
+        }
       }
     }
 

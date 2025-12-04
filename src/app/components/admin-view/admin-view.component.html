@@ -7,13 +7,33 @@
 <ion-content [fullscreen]="true">
   <div class="admin-container">
     
-    <!-- Data Insertion Form -->
+    <!-- Data Operation Form -->
     <ion-card class="insertion-card">
       <ion-card-header>
         <ion-card-title class="card-title">
           <fa-icon [icon]="faDatabase" class="title-icon"></fa-icon>
-          Generar Datos de Establo
+          {{ getOperationText() }} de Datos de Establo
         </ion-card-title>
+        
+        <!-- Operation Mode Toggles -->
+        <div class="operation-mode-toggle">
+          <button 
+            class="mode-btn" 
+            [class.active]="operationMode === 'insert'"
+            (click)="operationMode = 'insert'; clearForm()"
+            [disabled]="isProcessing">
+            <fa-icon [icon]="faPlus"></fa-icon>
+            Insertar
+          </button>
+          <button 
+            class="mode-btn" 
+            [class.active]="operationMode === 'delete'"
+            (click)="operationMode = 'delete'; clearForm()"
+            [disabled]="isProcessing">
+            <fa-icon [icon]="faTrash"></fa-icon>
+            Eliminar
+          </button>
+        </div>
       </ion-card-header>
       
       <ion-card-content>
@@ -87,10 +107,10 @@
             <ion-button 
               (click)="processDataInsertion()"
               [disabled]="!isFormValid() || isProcessing"
-              class="process-btn">
-              <fa-icon *ngIf="!isProcessing" [icon]="faPlay" class="btn-icon"></fa-icon>
+              [class]="operationMode === 'insert' ? 'process-btn' : 'delete-btn'">
+              <fa-icon *ngIf="!isProcessing" [icon]="operationMode === 'insert' ? faPlay : faTrash" class="btn-icon"></fa-icon>
               <fa-icon *ngIf="isProcessing" [icon]="faSpinner" class="btn-icon spinning"></fa-icon>
-              {{ isProcessing ? 'Procesando...' : 'Iniciar Inserción' }}
+              {{ getButtonText() }}
             </ion-button>
 
             <ion-button 
@@ -147,7 +167,7 @@
                   class="icon-error">
                 </fa-icon>
               </div>
-              <h4 class="step-title">1. Inserción de Inventario</h4>
+              <h4 class="step-title">1. {{ operationMode === 'insert' ? 'Inserción' : 'Eliminación' }} de {{ operationMode === 'insert' ? 'Inventario' : 'Eventos' }}</h4>
               <ion-badge [class]="'badge-' + getStepStatus('inventory')">
                 {{ getStepStatus('inventory') === 'processing' ? 'Procesando...' : 
                    getStepStatus('inventory') === 'success' ? 'Completado' : 
@@ -186,7 +206,7 @@
                   class="icon-error">
                 </fa-icon>
               </div>
-              <h4 class="step-title">2. Inserción de Eventos</h4>
+              <h4 class="step-title">2. {{ operationMode === 'insert' ? 'Inserción' : 'Eliminación' }} de {{ operationMode === 'insert' ? 'Eventos' : 'Inventario' }}</h4>
               <ion-badge [class]="'badge-' + getStepStatus('events')">
                 {{ getStepStatus('events') === 'processing' ? 'Procesando...' : 
                    getStepStatus('events') === 'success' ? 'Completado' : 

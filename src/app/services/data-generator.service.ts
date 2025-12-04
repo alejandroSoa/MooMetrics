@@ -72,6 +72,56 @@ export class DataGeneratorService {
   }
 
   /**
+   * Delete inventory data for a stable in a date range
+   */
+  deleteInventoryData(stable_id: number, startDate: string, endDate: string): Observable<DataGeneratorResponse> {
+    const payload: DataGeneratorRequest = {
+      stable_id,
+      startDate,
+      endDate
+    };
+
+    const headers = this.getAuthHeaders();
+    const url = `${this.API_URL}/data-generator/clean`;
+    
+    console.log('🗑️ Data Generator Service - DELETE INVENTORY');
+    console.log('📍 URL:', url);
+    console.log('🔧 Method: DELETE');
+    console.log('📦 Payload:', { ...payload, table: 'inventory' });
+    console.log('🔐 Headers:', headers);
+    
+    return this.http.delete<DataGeneratorResponse>(url, { 
+      headers, 
+      body: { ...payload, table: 'inventory' }
+    });
+  }
+
+  /**
+   * Delete events data for a stable in a date range
+   */
+  deleteEventsData(stable_id: number, startDate: string, endDate: string): Observable<DataGeneratorResponse> {
+    const payload: DataGeneratorRequest = {
+      stable_id,
+      startDate,
+      endDate
+    };
+
+    const headers = this.getAuthHeaders();
+    const url = `${this.API_URL}/data-generator/clean`;
+    
+    console.log('🗑️ Data Generator Service - DELETE EVENTS');
+    console.log('📍 URL:', url);
+    console.log('🔧 Method: DELETE');
+    console.log('📦 Payload:', { ...payload, table: 'events' });
+    console.log('🔐 Headers:', headers);
+    
+    return this.http.delete<DataGeneratorResponse>(url, { 
+      headers, 
+      body: { ...payload, table: 'events' }
+    });
+  }
+
+  /**
    * Process data insertion following the required flow:
    * 1. Insert inventory data first
    * 2. Then insert events data
@@ -130,6 +180,74 @@ export class DataGeneratorService {
             events: { 
               status: 'error', 
               message: 'No se insertaron eventos debido al fallo en inventario' 
+            },
+            success: false
+          });
+          observer.complete();
+        }
+      });
+    });
+  }
+
+  /**
+   * Process data deletion following the required flow:
+   * 1. Delete events data first
+   * 2. Then delete inventory data
+   */
+  processDataDeletion(stable_id: number, startDate: string, endDate: string): Observable<{
+    inventory: DataGeneratorResponse;
+    events: DataGeneratorResponse;
+    success: boolean;
+  }> {
+    return new Observable(observer => {
+      // First delete events data
+      this.deleteEventsData(stable_id, startDate, endDate).subscribe({
+        next: (eventsResponse) => {
+          if (eventsResponse.status === 'success') {
+            // If events deletion is successful, proceed with inventory
+            this.deleteInventoryData(stable_id, startDate, endDate).subscribe({
+              next: (inventoryResponse) => {
+                observer.next({
+                  inventory: inventoryResponse,
+                  events: eventsResponse,
+                  success: inventoryResponse.status === 'success'
+                });
+                observer.complete();
+              },
+              error: (inventoryError) => {
+                observer.next({
+                  inventory: { 
+                    status: 'error', 
+                    message: 'Error al eliminar inventario: ' + inventoryError.message 
+                  },
+                  events: eventsResponse,
+                  success: false
+                });
+                observer.complete();
+              }
+            });
+          } else {
+            // If events deletion fails, don't proceed with inventory
+            observer.next({
+              inventory: { 
+                status: 'error', 
+                message: 'No se eliminó inventario debido al fallo en eventos' 
+              },
+              events: eventsResponse,
+              success: false
+            });
+            observer.complete();
+          }
+        },
+        error: (eventsError) => {
+          observer.next({
+            inventory: { 
+              status: 'error', 
+              message: 'No se eliminó inventario debido al fallo en eventos' 
+            },
+            events: { 
+              status: 'error', 
+              message: 'Error al eliminar eventos: ' + eventsError.message 
             },
             success: false
           });

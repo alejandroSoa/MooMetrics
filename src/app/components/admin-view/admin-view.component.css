@@ -1,9 +1,7 @@
 .admin-container {
-  padding: 20px;
+  flex: 1;
   height: 100%;
   background-color: #ffffff;
-  max-width: 1200px;
-  margin: 0 auto;
 }
 
 .custom-title {
@@ -162,16 +160,23 @@
   margin-bottom: 10px;
 }
 
-/* ==================== Operation Mode Selector ==================== */
-.operation-mode-selector {
-  position: fixed;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1000;
+/* ==================== Main Layout ==================== */
+.main-layout {
+  display: flex;
+  gap: 15px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ==================== Operation Mode Sidebar ==================== */
+.operation-mode-sidebar {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  align-self: flex-start;
+  position: sticky;
+  top: 20px;
 }
 
 .mode-square-btn {
@@ -212,14 +217,15 @@
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-  .operation-mode-selector {
-    position: relative;
-    left: auto;
-    top: auto;
-    transform: none;
+  .main-layout {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .operation-mode-sidebar {
     flex-direction: row;
     justify-content: center;
-    margin-bottom: 15px;
+    position: static;
   }
   
   .mode-square-btn {

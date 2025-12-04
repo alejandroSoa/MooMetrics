@@ -5,27 +5,28 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <!-- Operation Mode Selector -->
-  <div class="operation-mode-selector">
-    <button 
-      class="mode-square-btn" 
-      [class.active]="operationMode === 'insert'"
-      (click)="operationMode = 'insert'; clearForm()"
-      [disabled]="isProcessing"
-      title="Insertar datos">
-      <fa-icon [icon]="faPlus"></fa-icon>
-    </button>
-    <button 
-      class="mode-square-btn" 
-      [class.active]="operationMode === 'delete'"
-      (click)="operationMode = 'delete'; clearForm()"
-      [disabled]="isProcessing"
-      title="Eliminar datos">
-      <fa-icon [icon]="faTrash"></fa-icon>
-    </button>
-  </div>
+  <div class="main-layout">
+    <!-- Operation Mode Selector -->
+    <div class="operation-mode-sidebar">
+      <button 
+        class="mode-square-btn" 
+        [class.active]="operationMode === 'insert'"
+        (click)="operationMode = 'insert'; clearForm()"
+        [disabled]="isProcessing"
+        title="Insertar datos">
+        <fa-icon [icon]="faPlus"></fa-icon>
+      </button>
+      <button 
+        class="mode-square-btn" 
+        [class.active]="operationMode === 'delete'"
+        (click)="operationMode = 'delete'; clearForm()"
+        [disabled]="isProcessing"
+        title="Eliminar datos">
+        <fa-icon [icon]="faTrash"></fa-icon>
+      </button>
+    </div>
 
-  <div class="admin-container">
+    <div class="admin-container">
     
     <!-- Data Operation Form -->
     <ion-card class="insertion-card">
@@ -229,5 +230,6 @@
       </ion-card-content>
     </ion-card>
 
+    </div>
   </div>
 </ion-content>

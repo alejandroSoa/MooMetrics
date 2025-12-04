@@ -38,7 +38,15 @@ export class DataGeneratorService {
     };
 
     const headers = this.getAuthHeaders();
-    return this.http.post<DataGeneratorResponse>(`${this.API_URL}/data-generator/inventory`, payload, { headers });
+    const url = `${this.API_URL}/data-generator/inventory`;
+    
+    console.log('🚀 Data Generator Service - INSERT INVENTORY');
+    console.log('📍 URL:', url);
+    console.log('🔧 Method: POST');
+    console.log('📦 Payload:', payload);
+    console.log('🔐 Headers:', headers);
+    
+    return this.http.post<DataGeneratorResponse>(url, payload, { headers });
   }
 
   /**
@@ -52,7 +60,15 @@ export class DataGeneratorService {
     };
 
     const headers = this.getAuthHeaders();
-    return this.http.post<DataGeneratorResponse>(`${this.API_URL}/data-generator/events`, payload, { headers });
+    const url = `${this.API_URL}/data-generator/events`;
+    
+    console.log('🚀 Data Generator Service - INSERT EVENTS');
+    console.log('📍 URL:', url);
+    console.log('🔧 Method: POST');
+    console.log('📦 Payload:', payload);
+    console.log('🔐 Headers:', headers);
+    
+    return this.http.post<DataGeneratorResponse>(url, payload, { headers });
   }
 
   /**
@@ -128,9 +144,13 @@ export class DataGeneratorService {
    */
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken();
-    return new HttpHeaders({
+    const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     });
+    
+    console.log('🔑 Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+    
+    return headers;
   }
 }

@@ -266,10 +266,61 @@ export class BiometricAuthService {
   }
 
   /**
-   * Detecta si es un dispositivo móvil
+   * Detecta si es un dispositivo móvil real (no simulado)
    */
   isMobileDevice(): boolean {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // Verificar múltiples indicadores para determinar si es realmente móvil
+    
+    // 1. Verificar user agent
+    const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // 2. Verificar si tiene capacidades táctiles reales
+    const hasTouchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    // 3. Verificar orientación del dispositivo (solo disponible en móviles reales)
+    const hasOrientationAPI = 'orientation' in window;
+    
+    // 4. Verificar si es realmente un dispositivo con sensor de aceleración
+    const hasMotionSensors = 'DeviceMotionEvent' in window;
+    
+    // 5. Verificar el tipo de conexión (móviles suelen tener conexiones específicas)
+    const connectionType = (navigator as any).connection?.type;
+    const isMobileConnection = connectionType === 'cellular' || connectionType === '3g' || connectionType === '4g';
+    
+    // 6. Verificar si el navegador reporta ser móvil nativamente
+    const isMobilePlatform = /Mobi|Android/i.test(navigator.userAgent) && !/Chrome|Firefox|Safari/i.test(navigator.userAgent.replace(/Mobile/gi, ''));
+    
+    // 7. Verificar ancho de pantalla física (no del viewport)
+    const screenWidth = screen.width;
+    const isMobileScreenSize = screenWidth <= 768;
+    
+    // Combinación de factores: debe cumplir al menos 3 de estos criterios
+    const mobileIndicators = [
+      mobileUserAgent,
+      hasTouchSupport && hasOrientationAPI,
+      hasMotionSensors && isMobileScreenSize,
+      isMobileConnection,
+      isMobilePlatform
+    ];
+    
+    const mobileScore = mobileIndicators.filter(indicator => indicator).length;
+    
+    // Debe cumplir al menos 2 criterios fuertes para considerarse móvil real
+    const isRealMobile = mobileScore >= 2 && mobileUserAgent;
+    
+    console.log('Mobile device detection:', {
+      userAgent: mobileUserAgent,
+      touchSupport: hasTouchSupport,
+      orientationAPI: hasOrientationAPI,
+      motionSensors: hasMotionSensors,
+      mobileConnection: isMobileConnection,
+      mobilePlatform: isMobilePlatform,
+      screenWidth: screenWidth,
+      mobileScore: mobileScore,
+      isRealMobile: isRealMobile
+    });
+    
+    return isRealMobile;
   }
 
   /**

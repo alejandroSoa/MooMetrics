@@ -108,9 +108,13 @@ export class LoginComponent {
    * Inicializa la configuración biométrica
    */
   private async initializeBiometric(): Promise<void> {
-    // Solo habilitar biométrica en dispositivos móviles
-    if (!this.biometricService.isMobileDevice()) {
+    // Verificar primero si es realmente un dispositivo móvil
+    const isMobile = this.biometricService.isMobileDevice();
+    console.log('Is mobile device:', isMobile);
+    
+    if (!isMobile) {
       this.isBiometricAvailable = false;
+      console.log('Biometric disabled: Not a mobile device');
       return;
     }
 
@@ -133,6 +137,7 @@ export class LoginComponent {
       console.log('Biometric available:', this.isBiometricAvailable, 'Has credentials:', this.hasBiometricCredentials);
     } else {
       this.isBiometricAvailable = false;
+      console.log('Biometric disabled: WebAuthn not available');
     }
   }
 
@@ -245,10 +250,21 @@ export class LoginComponent {
   }
 
   /**
-   * Verifica si debe mostrar la opción biométrica (solo móviles)
+   * Verifica si debe mostrar la opción biométrica (solo móviles reales)
    */
   shouldShowBiometric(): boolean {
-    return this.isBiometricAvailable && this.biometricService.isMobileDevice();
+    // Doble verificación: tanto la disponibilidad como que sea realmente móvil
+    const isMobile = this.biometricService.isMobileDevice();
+    const shouldShow = this.isBiometricAvailable && isMobile;
+    
+    if (!shouldShow) {
+      console.log('Biometric button hidden:', { 
+        available: this.isBiometricAvailable, 
+        mobile: isMobile 
+      });
+    }
+    
+    return shouldShow;
   }
 
 

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface DataGeneratorRequest {
   stable_id: number;
@@ -18,9 +20,12 @@ export interface DataGeneratorResponse {
   providedIn: 'root'
 })
 export class DataGeneratorService {
-  private baseUrl = 'https://paginachidota.lat/data-generator';
+  private readonly API_URL = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
   /**
    * Insert inventory data for a stable in a date range
@@ -32,7 +37,8 @@ export class DataGeneratorService {
       endDate
     };
 
-    return this.http.post<DataGeneratorResponse>(`${this.baseUrl}/inventory`, payload);
+    const headers = this.getAuthHeaders();
+    return this.http.post<DataGeneratorResponse>(`${this.API_URL}/data-generator/inventory`, payload, { headers });
   }
 
   /**
@@ -45,7 +51,8 @@ export class DataGeneratorService {
       endDate
     };
 
-    return this.http.post<DataGeneratorResponse>(`${this.baseUrl}/events`, payload);
+    const headers = this.getAuthHeaders();
+    return this.http.post<DataGeneratorResponse>(`${this.API_URL}/data-generator/events`, payload, { headers });
   }
 
   /**
@@ -113,6 +120,17 @@ export class DataGeneratorService {
           observer.complete();
         }
       });
+    });
+  }
+
+  /**
+   * Get authentication headers with bearer token
+   */
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
     });
   }
 }

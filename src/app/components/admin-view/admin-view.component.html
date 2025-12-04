@@ -80,7 +80,6 @@
           <div *ngIf="getSelectedStable()" class="selected-stable-info">
             <h4>Establo Seleccionado:</h4>
             <p><strong>{{ getSelectedStable()?.name }}</strong></p>
-            <p>ID: {{ getSelectedStable()?.id }}</p>
           </div>
 
           <!-- Action Buttons -->
@@ -96,12 +95,13 @@
             </ion-button>
 
             <ion-button 
+              *ngIf="hasFormData()"
               expand="block" 
               fill="outline" 
-              (click)="resetForm()"
+              (click)="clearForm()"
               [disabled]="isProcessing"
-              class="reset-btn">
-              Reiniciar
+              class="clear-btn">
+              Limpiar
             </ion-button>
           </div>
         </div>

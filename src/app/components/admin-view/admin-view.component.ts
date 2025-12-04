@@ -85,12 +85,8 @@ export class AdminViewComponent implements OnInit {
     private dataGeneratorService: DataGeneratorService
   ) {
     // Set default dates (current month)
-    const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    
-    this.startDate = firstDay.toISOString().split('T')[0];
-    this.endDate = lastDay.toISOString().split('T')[0];
+    this.startDate = this.getDefaultStartDate();
+    this.endDate = this.getDefaultEndDate();
   }
 
   ngOnInit() {
@@ -188,15 +184,17 @@ export class AdminViewComponent implements OnInit {
   }
 
   /**
-   * Reset the form and results
+   * Check if form has any data
    */
-  resetForm() {
+  hasFormData(): boolean {
+    return !!this.selectedStableId || this.startDate !== this.getDefaultStartDate() || this.endDate !== this.getDefaultEndDate();
+  }
+
+  /**
+   * Clear form data only
+   */
+  clearForm() {
     this.selectedStableId = null;
-    this.currentStep = 'idle';
-    this.inventoryResult = null;
-    this.eventsResult = null;
-    this.processError = '';
-    this.showResults = false;
     
     // Reset dates to current month
     const now = new Date();
@@ -205,6 +203,24 @@ export class AdminViewComponent implements OnInit {
     
     this.startDate = firstDay.toISOString().split('T')[0];
     this.endDate = lastDay.toISOString().split('T')[0];
+  }
+
+  /**
+   * Get default start date (first day of current month)
+   */
+  private getDefaultStartDate(): string {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    return firstDay.toISOString().split('T')[0];
+  }
+
+  /**
+   * Get default end date (last day of current month)
+   */
+  private getDefaultEndDate(): string {
+    const now = new Date();
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return lastDay.toISOString().split('T')[0];
   }
 
   /**

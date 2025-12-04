@@ -5,6 +5,26 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <!-- Operation Mode Selector -->
+  <div class="operation-mode-selector">
+    <button 
+      class="mode-square-btn" 
+      [class.active]="operationMode === 'insert'"
+      (click)="operationMode = 'insert'; clearForm()"
+      [disabled]="isProcessing"
+      title="Insertar datos">
+      <fa-icon [icon]="faPlus"></fa-icon>
+    </button>
+    <button 
+      class="mode-square-btn" 
+      [class.active]="operationMode === 'delete'"
+      (click)="operationMode = 'delete'; clearForm()"
+      [disabled]="isProcessing"
+      title="Eliminar datos">
+      <fa-icon [icon]="faTrash"></fa-icon>
+    </button>
+  </div>
+
   <div class="admin-container">
     
     <!-- Data Operation Form -->
@@ -14,26 +34,6 @@
           <fa-icon [icon]="faDatabase" class="title-icon"></fa-icon>
           {{ getOperationText() }} de Datos de Establo
         </ion-card-title>
-        
-        <!-- Operation Mode Toggles -->
-        <div class="operation-mode-toggle">
-          <button 
-            class="mode-btn" 
-            [class.active]="operationMode === 'insert'"
-            (click)="operationMode = 'insert'; clearForm()"
-            [disabled]="isProcessing">
-            <fa-icon [icon]="faPlus"></fa-icon>
-            Insertar
-          </button>
-          <button 
-            class="mode-btn" 
-            [class.active]="operationMode === 'delete'"
-            (click)="operationMode = 'delete'; clearForm()"
-            [disabled]="isProcessing">
-            <fa-icon [icon]="faTrash"></fa-icon>
-            Eliminar
-          </button>
-        </div>
       </ion-card-header>
       
       <ion-card-content>

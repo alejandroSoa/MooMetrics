@@ -7,6 +7,7 @@ import { StableService, Stable, StablesResponse } from '../../services/stable.se
 import { ChannelService, Channel, ChannelsResponse } from '../../services/channel.service';
 import { MessageService, Message, MessagesResponse, SendMessageRequest, MessageResponse } from '../../services/message.service';
 import { CowService, CowsListResponse, CowDetailResponse, InventoryResponse, EventsResponse, Cow } from '../../services/cow.service';
+import { ChatbotService } from '../../services/chatbot.service';
 
 interface ChatMessage {
   user: string;
@@ -108,7 +109,8 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     private stableService: StableService,
     private channelService: ChannelService,
     private messageService: MessageService,
-    private cowService: CowService
+    private cowService: CowService,
+    private chatbotService: ChatbotService
   ) {}
 
   ngOnInit() {
@@ -365,14 +367,21 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     let botResponse = '';
     switch(option.action) {
       case 'showInventory':
-        this.loadInventoryReport();
+        this.loadCowsList(1);
         return; // Exit early, response will be handled in the service call
       case 'showEvents':
         this.loadEventsReport();
         return; // Exit early, response will be handled in the service call
       case 'searchCow':
-        this.loadCowsList(1);
-        return; // Exit early, response will be handled in the service call
+        const askName: ChatMessage = {
+          user: 'MooBot 🤖',
+          message: 'Perfecto 🐄✨ ¿Cómo se llama la vaca que deseas buscar?',
+          isBot: true
+        };
+
+        this.botMessages.push(askName);
+        this.triggerScrollToBottom();
+        return;
       case 'closeBot':
         botResponse = '👋 ¡Hasta luego! Si necesitas ayuda, escribe #bot para activarme de nuevo.';
         this.botMode = false;
@@ -432,8 +441,15 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
         this.loadEventsReport();
         return; // Exit early, response will be handled in the service call
       case 'searchCow':
-        this.loadCowsList(1);
-        return; // Exit early, response will be handled in the service call
+        const askName: ChatMessage = {
+          user: 'MooBot 🤖',
+          message: 'Perfecto 🐄✨ ¿Cómo se llama la vaca que deseas buscar?',
+          isBot: true
+        };
+
+        this.botMessages.push(askName);
+        this.triggerScrollToBottom();
+        return;
       case 'closeBot':
         botResponse = '👋 ¡Hasta luego! Si necesitas ayuda, escribe #bot para activarme de nuevo.';
         this.botMode = false;
@@ -612,30 +628,19 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
    * Generate events report from API response
    */
   generateEventsReportFromAPI(data: any): string {
-    let report = `📊 RESUMEN DE EVENTOS - ${data.stableName}\n\n`;
-    report += `📈 ${data.period.toUpperCase()}:\n\n`;
-    
-    report += `🩺 EVENTOS VETERINARIOS:\n`;
-    data.veterinaryEvents.forEach((event: any) => {
-      report += `• ${event.type}: ${event.count} eventos\n`;
+    if (!data || !data.events) {
+      return "No se encontraron eventos en la base de datos.";
+    }
+
+    let message = "Reporte de Eventos del Establo*\n\n";
+
+    data.events.forEach((event: any) => {
+      message += `• ${event.type}: ${event.count}\n`;
     });
-    report += '\n';
-    
-    report += `🐄 EVENTOS REPRODUCTIVOS:\n`;
-    data.reproductiveEvents.forEach((event: any) => {
-      report += `• ${event.type}: ${event.count} eventos\n`;
-    });
-    report += '\n';
-    
-    report += `🏥 MANEJO:\n`;
-    data.managementEvents.forEach((event: any) => {
-      report += `• ${event.type}: ${event.count} eventos\n`;
-    });
-    report += '\n';
-    
-    report += `📊 TOTAL EVENTOS: ${data.totalEvents}`;
-    
-    return report;
+
+    message += `\n🟦 *Total de eventos registrados: ${data.totalEvents}`;
+
+    return message;
   }
   
   /**
@@ -688,7 +693,7 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
   }
 
   /**
-   * Load cows list from API service
+   * Load cows list from API service via chatbot endpoint
    */
   loadCowsList(page: number): void {
     if (!this.selectedChannel) return;
@@ -705,30 +710,29 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     this.botMessages.push(loadingMessage);
     this.triggerScrollToBottom();
     
-    // Get current stable ID
-    const currentStableId = this.stables[this.selectedStableIndex]?.id || 1;
-    
-    // Call API service
-    this.cowService.getCowsByStableId(currentStableId, page, this.itemsPerPage).subscribe({
-      next: (response: CowsListResponse) => {
-        this.isLoadingCows = false;
-        
-        if (response.status === 'success') {
-          this.cowsData = response.data.cows;
-          this.totalPages = response.data.pagination.totalPages;
-          this.showCowList = true;
-          
-          // Remove loading message and add cow list
-          this.botMessages.pop(); // Remove loading message
-          
-          const listMessage = this.generateCowListMessage(response.data.cows, response.data.pagination);
-          const botMessage: ChatMessage = {
-            user: 'MooBot 🤖',
-            message: listMessage,
-            isBot: true
-          };
-          this.botMessages.push(botMessage);
-          this.triggerScrollToBottom();
+    // Call API service via chatbot endpoint
+    this.chatbotService.getCowList(1).subscribe({
+      next: (response: any) => {
+      this.isLoadingCows = false;
+
+      if (response.status === 'success') {
+
+        this.cowsData = response.data.cows;
+        this.totalPages = 1; // Por ahora no hay paginación
+        this.showCowList = true;
+
+        // Remove loading message
+        this.botMessages.pop();
+
+        const listMessage = this.generateCowListMessage(response.data.cows);
+        const botMessage: ChatMessage = {
+          user: 'MooBot 🤖',
+          message: listMessage,
+          isBot: true
+        };
+
+        this.botMessages.push(botMessage);
+        this.triggerScrollToBottom();
         } else {
           this.botMessages.pop(); // Remove loading message
           const errorMessage: ChatMessage = {
@@ -759,26 +763,20 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
   /**
    * Generate cow list message from API response
    */
-  generateCowListMessage(cows: Cow[], pagination: any): string {
-    let listMessage = `🐄 LISTADO DE VACAS DISPONIBLES\n\n`;
-    listMessage += `📄 Página ${pagination.currentPage} de ${pagination.totalPages}\n`;
-    listMessage += `📊 Total: ${pagination.totalItems} vacas\n\n`;
-    
-    cows.forEach((cow, index) => {
-      const displayNumber = ((pagination.currentPage - 1) * pagination.itemsPerPage) + index + 1;
-      listMessage += `${displayNumber}. ${cow.id} - ${cow.name}\n`;
-      listMessage += `   Raza: ${cow.breed} | Edad: ${cow.age} | Sexo: ${cow.sex}\n\n`;
+  generateCowListMessage(cows: any[]): string {
+    let message = "🐄 Lista de vacas:\n\n";
+
+    cows.forEach(cow => {
+      message += `• ID: ${cow.id}\n`;
+      message += `  Nombre: ${cow.name}\n`;
+      message += `  Raza: ${cow.breed}\n`;
+      message += `  Sexo: ${cow.sex}\n`;
+      message += `  Fecha nacimiento: ${cow.birthDate}\n\n`;
     });
-    
-    listMessage += `📋 COMANDOS DISPONIBLES:\n`;
-    if (pagination.currentPage > 1) listMessage += `• "anterior" - Página anterior\n`;
-    if (pagination.currentPage < pagination.totalPages) listMessage += `• "siguiente" - Página siguiente\n`;
-    listMessage += `• "página X" - Ir a página específica (ej: página 5)\n`;
-    listMessage += `• Escribe el PKY de la vaca para ver detalles (ej: PKY001)\n`;
-    listMessage += `• "salir" - Volver al menú principal`;
-    
-    return listMessage;
+
+    return message;
   }
+
   
   /**
    * Process cow list input (navigation and selection)
@@ -852,6 +850,9 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
   /**
    * Load cow detail from API service
    */
+  /**
+   * Load cow detail from API service via chatbot endpoint
+   */
   loadCowDetail(cowId: string): void {
     this.isLoadingCowDetail = true;
     this.showCowList = false;
@@ -865,8 +866,8 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     this.botMessages.push(loadingMessage);
     this.triggerScrollToBottom();
     
-    this.cowService.getCowDetail(cowId).subscribe({
-      next: (response: CowDetailResponse) => {
+    this.chatbotService.getCowDetail(1).subscribe({
+      next: (response: any) => {
         this.isLoadingCowDetail = false;
         this.botMessages.pop(); // Remove loading message
         
@@ -918,7 +919,7 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
   }
   
   /**
-   * Load inventory report from API service
+   * Load inventory report from API service via chatbot endpoint
    */
   loadInventoryReport(): void {
     this.isLoadingInventory = true;
@@ -932,11 +933,8 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     this.botMessages.push(loadingMessage);
     this.triggerScrollToBottom();
     
-    // Get current stable ID
-    const currentStableId = this.stables[this.selectedStableIndex]?.id || 1;
-    
-    this.cowService.getInventoryByStableId(currentStableId).subscribe({
-      next: (response: InventoryResponse) => {
+    this.chatbotService.getInventory(1).subscribe({
+      next: (response: any) => {
         this.isLoadingInventory = false;
         this.botMessages.pop(); // Remove loading message
         
@@ -990,6 +988,9 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
   /**
    * Load events report from API service
    */
+  /**
+   * Load events report from API service via chatbot endpoint
+   */
   loadEventsReport(): void {
     this.isLoadingEvents = true;
     
@@ -1002,11 +1003,8 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     this.botMessages.push(loadingMessage);
     this.triggerScrollToBottom();
     
-    // Get current stable ID
-    const currentStableId = this.stables[this.selectedStableIndex]?.id || 1;
-    
-    this.cowService.getEventsByStableId(currentStableId).subscribe({
-      next: (response: EventsResponse) => {
+    this.chatbotService.getEvents(1).subscribe({
+      next: (response: any) => {
         this.isLoadingEvents = false;
         this.botMessages.pop(); // Remove loading message
         
@@ -1056,6 +1054,9 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
       }
     });
   }
+
+
+
   
   /**
    * Process cow search input

@@ -210,7 +210,7 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
       next: (response: MessagesResponse) => {
         if (response.status === 'success') {
           channel.chatMessages = response.data.map(message => ({
-            user: message.userName || `Usuario ${message.userId}`,
+            user: message.user?.name || `Usuario ${message.userId}`,
             message: message.content,
             isBot: message.isBot || false
           }));
@@ -542,7 +542,7 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
         if (response.status === 'success') {
           // Add the new message to the chat
           const newMessage: ChatMessage = {
-            user: response.data.userName || `Usuario ${response.data.userId}`,
+            user: response.data.user?.name || `Usuario ${response.data.userId}`,
             message: response.data.content,
             isBot: response.data.isBot || false
           };

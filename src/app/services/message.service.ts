@@ -11,7 +11,11 @@ export interface Message {
   content: string;
   channelId: number;
   userId: number;
-  userName?: string;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+  };
   createdAt: string;
   isBot?: boolean;
 }

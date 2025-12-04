@@ -134,7 +134,11 @@ export class AdminViewComponent implements OnInit {
    * Check if form is valid
    */
   isFormValid(): boolean {
-    return !!this.selectedStableId && !!this.startDate && !!this.endDate && this.startDate <= this.endDate;
+    const hasRequiredFields = !!this.selectedStableId && !!this.startDate && !!this.endDate;
+    const validDateRange = this.startDate < this.endDate;
+    const endDateNotFuture = this.endDate <= new Date().toISOString().split('T')[0];
+    
+    return hasRequiredFields && validDateRange && endDateNotFuture;
   }
 
   /**
@@ -291,31 +295,26 @@ export class AdminViewComponent implements OnInit {
     this.processError = '';
     this.showResults = false;
     
-    // Reset dates to current month
-    const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    
-    this.startDate = firstDay.toISOString().split('T')[0];
-    this.endDate = lastDay.toISOString().split('T')[0];
+    // Reset dates to default range
+    this.startDate = this.getDefaultStartDate();
+    this.endDate = this.getDefaultEndDate();
   }
 
   /**
-   * Get default start date (first day of current month)
+   * Get default start date (30 days ago)
    */
   private getDefaultStartDate(): string {
     const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    return firstDay.toISOString().split('T')[0];
+    const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+    return thirtyDaysAgo.toISOString().split('T')[0];
   }
 
   /**
-   * Get default end date (last day of current month)
+   * Get default end date (today)
    */
   private getDefaultEndDate(): string {
     const now = new Date();
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    return lastDay.toISOString().split('T')[0];
+    return now.toISOString().split('T')[0];
   }
 
   /**

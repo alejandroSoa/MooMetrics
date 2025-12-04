@@ -10,14 +10,12 @@ export interface Message {
   id: number;
   content: string;
   channelId: number;
-  userId: number;
+  createdAt: string;
   user?: {
     id: number;
     name: string;
     email: string;
   };
-  createdAt: string;
-  isBot?: boolean;
 }
 
 export interface MessagesResponse {

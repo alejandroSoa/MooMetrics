@@ -1,13 +1,235 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title class="custom-title">Panel de Administración</ion-title>
+    <ion-title class="custom-title">Inserción de Datos por Establo</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="admin-container">
-    <div class="admin-content">
-      <p>Bienvenido al panel de administración de MooMetrics</p>
+  <div class="main-layout">
+    <!-- Operation Mode Selector -->
+    <div class="operation-mode-sidebar">
+      <button 
+        class="mode-square-btn" 
+        [class.active]="operationMode === 'insert'"
+        (click)="operationMode = 'insert'; clearForm()"
+        [disabled]="isProcessing"
+        title="Insertar datos">
+        <fa-icon [icon]="faPlus"></fa-icon>
+      </button>
+      <button 
+        class="mode-square-btn" 
+        [class.active]="operationMode === 'delete'"
+        (click)="operationMode = 'delete'; clearForm()"
+        [disabled]="isProcessing"
+        title="Eliminar datos">
+        <fa-icon [icon]="faTrash"></fa-icon>
+      </button>
+    </div>
+
+    <div class="admin-container">
+    
+    <!-- Data Operation Form -->
+    <ion-card class="insertion-card">
+      <ion-card-header>
+        <ion-card-title class="card-title">
+          <fa-icon [icon]="faDatabase" class="title-icon"></fa-icon>
+          {{ getOperationText() }} de Datos de Establo
+        </ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <div class="form-container">
+          
+          <!-- Stable Selection -->
+          <ion-item class="form-item">
+            <ion-label position="stacked">Seleccionar Establo</ion-label>
+            <ion-select 
+              [(ngModel)]="selectedStableId" 
+              placeholder="Elige un establo"
+              [disabled]="isProcessing"
+              interface="popover">
+              <ion-select-option 
+                *ngFor="let stable of stables" 
+                [value]="stable.id">
+                {{ stable.name }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <!-- Loading Stables -->
+          <div *ngIf="isLoadingStables" class="loading-section">
+            <ion-spinner name="dots"></ion-spinner>
+            <span>Cargando establos...</span>
+          </div>
+
+          <!-- Stables Error -->
+          <div *ngIf="stablesError" class="error-section">
+            <p>{{ stablesError }}</p>
+            <ion-button fill="outline" size="small" (click)="loadStables()">
+              Reintentar
+            </ion-button>
+          </div>
+
+          <!-- Date Range -->
+          <div class="date-range">
+            <ion-item class="form-item">
+              <ion-label position="stacked">
+                <fa-icon [icon]="faCalendarAlt" class="label-icon"></fa-icon>
+                Fecha Inicio
+              </ion-label>
+              <ion-input 
+                type="date" 
+                [(ngModel)]="startDate"
+                [disabled]="isProcessing">
+              </ion-input>
+            </ion-item>
+
+            <ion-item class="form-item">
+              <ion-label position="stacked">
+                <fa-icon [icon]="faCalendarAlt" class="label-icon"></fa-icon>
+                Fecha Fin
+              </ion-label>
+              <ion-input 
+                type="date" 
+                [(ngModel)]="endDate"
+                [disabled]="isProcessing">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <!-- Selected Stable Info -->
+          <div *ngIf="getSelectedStable()" class="selected-stable-info">
+            <h4>Establo Seleccionado:</h4>
+            <p><strong>{{ getSelectedStable()?.name }}</strong></p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <ion-button 
+              (click)="processDataInsertion()"
+              [disabled]="!isFormValid() || isProcessing"
+              [class]="operationMode === 'insert' ? 'process-btn' : 'delete-btn'">
+              <fa-icon *ngIf="!isProcessing" [icon]="operationMode === 'insert' ? faPlay : faTrash" class="btn-icon"></fa-icon>
+              <fa-icon *ngIf="isProcessing" [icon]="faSpinner" class="btn-icon spinning"></fa-icon>
+              {{ getButtonText() }}
+            </ion-button>
+
+            <ion-button 
+              *ngIf="hasFormData()"
+              fill="outline" 
+              (click)="clearForm()"
+              [disabled]="isProcessing"
+              class="clear-btn">
+              Limpiar
+            </ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Process Status -->
+    <ion-card *ngIf="isProcessing || showResults" class="status-card">
+      <ion-card-header>
+        <ion-card-title class="status-title">Estado del Proceso</ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <!-- Progress Bar -->
+        <ion-progress-bar 
+          *ngIf="isProcessing"
+          type="indeterminate" 
+          class="progress-bar">
+        </ion-progress-bar>
+
+        <!-- Process Steps -->
+        <div class="process-steps">
+          <!-- Inventory Step -->
+          <div class="process-step">
+            <div class="step-header">
+              <div class="step-icon">
+                <fa-icon 
+                  *ngIf="getStepStatus('inventory') === 'pending'" 
+                  [icon]="faDatabase" 
+                  class="icon-pending">
+                </fa-icon>
+                <fa-icon 
+                  *ngIf="getStepStatus('inventory') === 'processing'" 
+                  [icon]="faSpinner" 
+                  class="icon-processing spinning">
+                </fa-icon>
+                <fa-icon 
+                  *ngIf="getStepStatus('inventory') === 'success'" 
+                  [icon]="faCheckCircle" 
+                  class="icon-success">
+                </fa-icon>
+                <fa-icon 
+                  *ngIf="getStepStatus('inventory') === 'error'" 
+                  [icon]="faTimesCircle" 
+                  class="icon-error">
+                </fa-icon>
+              </div>
+              <h4 class="step-title">1. {{ operationMode === 'insert' ? 'Inserción' : 'Eliminación' }} de {{ operationMode === 'insert' ? 'Inventario' : 'Eventos' }}</h4>
+              <ion-badge [class]="'badge-' + getStepStatus('inventory')">
+                {{ getStepStatus('inventory') === 'processing' ? 'Procesando...' : 
+                   getStepStatus('inventory') === 'success' ? 'Completado' : 
+                   getStepStatus('inventory') === 'error' ? 'Error' : 'Pendiente' }}
+              </ion-badge>
+            </div>
+            <div *ngIf="inventoryResult" class="step-result">
+              <p [class]="inventoryResult.status === 'success' ? 'result-success' : 'result-error'">
+                {{ inventoryResult.message }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Events Step -->
+          <div class="process-step">
+            <div class="step-header">
+              <div class="step-icon">
+                <fa-icon 
+                  *ngIf="getStepStatus('events') === 'pending'" 
+                  [icon]="faDatabase" 
+                  class="icon-pending">
+                </fa-icon>
+                <fa-icon 
+                  *ngIf="getStepStatus('events') === 'processing'" 
+                  [icon]="faSpinner" 
+                  class="icon-processing spinning">
+                </fa-icon>
+                <fa-icon 
+                  *ngIf="getStepStatus('events') === 'success'" 
+                  [icon]="faCheckCircle" 
+                  class="icon-success">
+                </fa-icon>
+                <fa-icon 
+                  *ngIf="getStepStatus('events') === 'error'" 
+                  [icon]="faTimesCircle" 
+                  class="icon-error">
+                </fa-icon>
+              </div>
+              <h4 class="step-title">2. {{ operationMode === 'insert' ? 'Inserción' : 'Eliminación' }} de {{ operationMode === 'insert' ? 'Eventos' : 'Inventario' }}</h4>
+              <ion-badge [class]="'badge-' + getStepStatus('events')">
+                {{ getStepStatus('events') === 'processing' ? 'Procesando...' : 
+                   getStepStatus('events') === 'success' ? 'Completado' : 
+                   getStepStatus('events') === 'error' ? 'Error' : 'Pendiente' }}
+              </ion-badge>
+            </div>
+            <div *ngIf="eventsResult" class="step-result">
+              <p [class]="eventsResult.status === 'success' ? 'result-success' : 'result-error'">
+                {{ eventsResult.message }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Global Process Error -->
+        <div *ngIf="processError" class="global-error">
+          <fa-icon [icon]="faTimesCircle" class="error-icon"></fa-icon>
+          <p>{{ processError }}</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
     </div>
   </div>
 </ion-content>

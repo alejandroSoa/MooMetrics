@@ -5,7 +5,8 @@ import { environment } from '../../environments/environment';
 
 export interface ChatbotCommandRequest {
   command: string;
-  stable_id: number;
+  stable_id?: number;
+  name?: string;
 }
 
 export interface ChatbotResponse {
@@ -83,10 +84,10 @@ export class ChatbotService {
   /**
    * Helper method for getCowDetail command
    */
-  getCowDetail(stable_id: number): Observable<ChatbotResponse> {
+  getCowDetail(name: string): Observable<ChatbotResponse> {
     return this.sendCommand({
       command: 'getCowDetail',
-      stable_id: stable_id
+      name: name
     });
   }
 

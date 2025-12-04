@@ -373,6 +373,7 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
         this.loadEventsReport();
         return; // Exit early, response will be handled in the service call
       case 'searchCow':
+        this.showCowSearchInput = true; 
         const askName: ChatMessage = {
           user: 'MooBot 🤖',
           message: 'Perfecto 🐄✨ ¿Cómo se llama la vaca que deseas buscar?',
@@ -441,6 +442,7 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
         this.loadEventsReport();
         return; // Exit early, response will be handled in the service call
       case 'searchCow':
+        this.showCowSearchInput = true; 
         const askName: ChatMessage = {
           user: 'MooBot 🤖',
           message: 'Perfecto 🐄✨ ¿Cómo se llama la vaca que deseas buscar?',
@@ -502,11 +504,30 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     }
     
     // If in bot mode and showing cow list, handle navigation and selection
+    if (this.botMode && this.showCowSearchInput) {
+      const searchTerm = this.messageInput.trim();
+      this.messageInput = '';
+
+      const userMessage: ChatMessage = {
+        user: 'Tú',
+        message: `Buscar: ${searchTerm}`,
+        isBot: false
+      };
+      this.botMessages.push(userMessage);
+      this.triggerScrollToBottom();
+
+      setTimeout(() => {
+        this.processCowSearch(searchTerm);
+      }, 500);
+
+      return;
+    }
+
+    // 2️⃣ Luego navegación de lista
     if (this.botMode && this.showCowList) {
       const input = this.messageInput.trim().toLowerCase();
       this.messageInput = '';
-      
-      // Add user input message
+
       const userMessage: ChatMessage = {
         user: 'Tú',
         message: input,
@@ -514,11 +535,11 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
       };
       this.botMessages.push(userMessage);
       this.triggerScrollToBottom();
-      
+
       setTimeout(() => {
         this.processCowListInput(input);
       }, 500);
-      
+
       return;
     }
     
@@ -642,6 +663,15 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
 
     return message;
   }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-MX', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  }
   
   /**
    * Generate cow report from API response
@@ -652,11 +682,9 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     report += `📋 DATOS BÁSICOS:\n`;
     report += `• PKY: ${cow.id}\n`;
     report += `• Nombre: ${cow.name}\n`;
-    report += `• Establo: ${cow.barnName}\n`;
     report += `• Sexo: ${cow.sex === 'F' ? 'Hembra (F)' : 'Macho (M)'}\n`;
     report += `• Raza: ${cow.breed}\n`;
-    report += `• Fecha nacimiento: ${cow.birthDate}\n`;
-    report += `• Edad: ${cow.age}\n\n`;
+    report += `• Fecha nacimiento: ${this.formatDate(cow.birthDate)}\n`;
     
     if (cow.events) {
       report += `📊 EVENTOS REGISTRADOS:\n`;
@@ -798,7 +826,7 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
       message += `  Nombre: ${cow.name}\n`;
       message += `  Raza: ${cow.breed}\n`;
       message += `  Sexo: ${cow.sex}\n`;
-      message += `  Fecha nacimiento: ${cow.birthDate}\n\n`;
+      message += `  Fecha nacimiento: ${this.formatDate(cow.birthDate)}\n\n`;
     });
 
     // Add navigation instructions
@@ -897,69 +925,44 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
   /**
    * Load cow detail from API service via chatbot endpoint
    */
-  loadCowDetail(cowId: string): void {
-    this.isLoadingCowDetail = true;
-    this.showCowList = false;
-    
-    // Add loading message
-    const loadingMessage: ChatMessage = {
-      user: 'MooBot 🤖',
-      message: `🔄 Cargando información de ${cowId}...`,
-      isBot: true
-    };
-    this.botMessages.push(loadingMessage);
-    this.triggerScrollToBottom();
-    
-    this.chatbotService.getCowDetail(1).subscribe({
-      next: (response: any) => {
-        this.isLoadingCowDetail = false;
-        this.botMessages.pop(); // Remove loading message
-        
-        if (response.status === 'success') {
-          const cowReport = this.generateCowReportFromAPI(response.data);
-          const botMessage: ChatMessage = {
-            user: 'MooBot 🤖',
-            message: cowReport,
-            isBot: true
-          };
-          this.botMessages.push(botMessage);
-          this.triggerScrollToBottom();
-          
-          // Show menu again after a delay
-          setTimeout(() => {
-            const followUpMessage: ChatMessage = {
-              user: 'MooBot 🤖',
-              message: '¿Deseas consultar otra vaca o necesitas algo más?',
-              isBot: true
-            };
-            this.botMessages.push(followUpMessage);
-            this.triggerScrollToBottom();
-            this.showBotMenu = true;
-          }, 1000);
-        } else {
-          const errorMessage: ChatMessage = {
-            user: 'MooBot 🤖',
-            message: `❌ ${response.message}`,
-            isBot: true
-          };
-          this.botMessages.push(errorMessage);
-          this.triggerScrollToBottom();
-        }
-      },
-      error: (error) => {
-        this.isLoadingCowDetail = false;
-        this.botMessages.pop(); // Remove loading message
-        
-        console.error('Error loading cow detail:', error);
-        const errorMessage: ChatMessage = {
+  loadCowDetail(name: string): void {
+    this.chatbotService.getCowDetail(name).subscribe({
+    next: (res: any) => {
+      if (res.status !== 'success' || !res.data) {
+        this.botMessages.push({
           user: 'MooBot 🤖',
-          message: `❌ Error al cargar información de ${cowId}. Intenta nuevamente.`,
+          message: `No encontré ninguna vaca llamada "${name}". ¿Quieres intentar con otro nombre?`,
           isBot: true
-        };
-        this.botMessages.push(errorMessage);
+        });
         this.triggerScrollToBottom();
+        return;
       }
-    });
+
+      const cow = res.data;
+      const report = this.generateCowReportFromAPI(cow);
+
+      this.botMessages.push({
+        user: 'MooBot 🤖',
+        message: report,
+        isBot: true
+      });
+      this.triggerScrollToBottom();
+
+      // Reabrir menú del bot
+      setTimeout(() => {
+        this.showBotMenu = true;
+      }, 500);
+    },
+
+    error: () => {
+      this.botMessages.push({
+        user: 'MooBot 🤖',
+        message: `Ocurrió un error al buscar la vaca "${name}".`,
+        isBot: true
+      });
+      this.triggerScrollToBottom();
+    }
+  });
   }
   
   /**
@@ -1106,60 +1109,57 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
    * Process cow search input
    */
   processCowSearch(searchTerm: string): void {
-    // Mock cow data search
-    const cowData = this.generateCowReport(searchTerm);
-    
-    const botMessage: ChatMessage = {
-      user: 'MooBot 🤖',
-      message: cowData,
-      isBot: true
-    };
-    this.botMessages.push(botMessage);
-    this.triggerScrollToBottom();
-    
-    this.showCowSearchInput = false;
-    
-    // Show menu again
-    setTimeout(() => {
-      const followUpMessage: ChatMessage = {
-        user: 'MooBot 🤖',
-        message: '¿Deseas consultar otra vaca o necesitas algo más?',
-        isBot: true
-      };
-      this.botMessages.push(followUpMessage);
-      this.triggerScrollToBottom();
-      this.showBotMenu = true;
-    }, 1000);
+    // Llamar a la API directamente
+    this.chatbotService.getCowDetail(searchTerm).subscribe({
+      next: (res: any) => {
+        if (res.status !== 'success' || !res.data) {
+          this.botMessages.push({
+            user: 'MooBot 🤖',
+            message: `No encontré ninguna vaca llamada "${searchTerm}". ¿Quieres intentar con otro nombre?`,
+            isBot: true
+          });
+          this.triggerScrollToBottom();
+          this.showCowSearchInput = true; // Mantener el input activo para reintentar
+          return;
+        }
+
+        // Construir reporte
+        const cow = res.data;
+        const report = this.generateCowReportFromAPI(cow);
+
+        this.botMessages.push({
+          user: 'MooBot 🤖',
+          message: report,
+          isBot: true
+        });
+        this.triggerScrollToBottom();
+
+        this.showCowSearchInput = false;
+
+        // Mandar mensaje de seguimiento
+        setTimeout(() => {
+          this.botMessages.push({
+            user: 'MooBot 🤖',
+            message: '¿Deseas consultar otra vaca o necesitas algo más?',
+            isBot: true
+          });
+
+          this.triggerScrollToBottom();
+          this.showBotMenu = true;
+        }, 1000);
+      },
+
+      error: () => {
+        this.botMessages.push({
+          user: 'MooBot 🤖',
+          message: `Ocurrió un error al buscar la vaca "${searchTerm}". Verifica el nombre e intenta de nuevo.`,
+          isBot: true
+        });
+        this.triggerScrollToBottom();
+      }
+    });
   }
 
-  /**
-   * Generate individual cow report
-   */
-  generateCowReport(searchTerm: string): string {
-    return `🔍 INFORMACIÓN DE VACA - ID: ${searchTerm}\n\n` +
-           `📋 DATOS BÁSICOS:\n` +
-           `• PKY: ${searchTerm}\n` +
-           `• Establo: ${this.stables[this.selectedStableIndex]?.name || 'MSD-001'}\n` +
-           `• Sexo: Hembra (F)\n` +
-           `• Raza: Holstein\n` +
-           `• Fecha nacimiento: 15/03/2021\n` +
-           `• Edad: 3 años 8 meses\n\n` +
-           `📊 EVENTOS REGISTRADOS:\n` +
-           `• Diagnósticos: 8 eventos\n` +
-           `• Chequeos embarazo: 5 eventos\n` +
-           `• Cruces: 3 eventos\n` +
-           `• Tratamientos: 2 eventos\n` +
-           `• Nacimientos: 2 eventos\n\n` +
-           `🏥 ÚLTIMO EVENTO:\n` +
-           `• Tipo: Chequeo embarazo\n` +
-           `• Fecha: 18/11/2024\n` +
-           `• Técnico: Dr. García\n` +
-           `• Estado: Gestante - 45 días\n\n` +
-           `📈 ESTADO ACTUAL:\n` +
-           `• Lactancia: 2° lactancia\n` +
-           `• Días en leche: 156\n` +
-           `• Producción: 28.5 L/día`;
-  }
 
   /**
    * Exit bot mode and return to normal chat

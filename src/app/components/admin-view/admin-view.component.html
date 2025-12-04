@@ -85,7 +85,6 @@
           <!-- Action Buttons -->
           <div class="action-buttons">
             <ion-button 
-              expand="block" 
               (click)="processDataInsertion()"
               [disabled]="!isFormValid() || isProcessing"
               class="process-btn">
@@ -96,7 +95,6 @@
 
             <ion-button 
               *ngIf="hasFormData()"
-              expand="block" 
               fill="outline" 
               (click)="clearForm()"
               [disabled]="isProcessing"

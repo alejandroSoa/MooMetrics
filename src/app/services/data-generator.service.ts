@@ -82,7 +82,7 @@ export class DataGeneratorService {
     };
 
     const headers = this.getAuthHeaders();
-    const url = `${this.API_URL}/data-generator/clean`;
+    const url = `${this.API_URL}/data-generator/clear`;
     
     console.log('🗑️ Data Generator Service - DELETE INVENTORY');
     console.log('📍 URL:', url);
@@ -107,7 +107,7 @@ export class DataGeneratorService {
     };
 
     const headers = this.getAuthHeaders();
-    const url = `${this.API_URL}/data-generator/clean`;
+    const url = `${this.API_URL}/data-generator/clear`;
     
     console.log('🗑️ Data Generator Service - DELETE EVENTS');
     console.log('📍 URL:', url);

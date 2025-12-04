@@ -84,12 +84,6 @@ export class DataGeneratorService {
     const headers = this.getAuthHeaders();
     const url = `${this.API_URL}/data-generator/clear`;
     
-    console.log('🗑️ Data Generator Service - DELETE INVENTORY');
-    console.log('📍 URL:', url);
-    console.log('🔧 Method: DELETE');
-    console.log('📦 Payload:', { ...payload, table: 'inventory' });
-    console.log('🔐 Headers:', headers);
-    
     return this.http.delete<DataGeneratorResponse>(url, { 
       headers, 
       body: { ...payload, table: 'inventory' }
@@ -108,12 +102,6 @@ export class DataGeneratorService {
 
     const headers = this.getAuthHeaders();
     const url = `${this.API_URL}/data-generator/clear`;
-    
-    console.log('🗑️ Data Generator Service - DELETE EVENTS');
-    console.log('📍 URL:', url);
-    console.log('🔧 Method: DELETE');
-    console.log('📦 Payload:', { ...payload, table: 'events' });
-    console.log('🔐 Headers:', headers);
     
     return this.http.delete<DataGeneratorResponse>(url, { 
       headers, 

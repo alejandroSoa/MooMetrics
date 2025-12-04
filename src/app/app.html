@@ -36,13 +36,6 @@
           </a>
         </div>
 
-        <div class="nav-icon-container">
-          <div class="nav-active-indicator" *ngIf="isActive('/notifications')"></div>
-          <a class="nav-icon" [routerLink]="['/notifications']">
-            <fa-icon [icon]="faBell"></fa-icon>
-          </a>
-        </div>
-
         <!-- Logout Icon in Normal Mode -->
         <div class="nav-icon-container logout-container">
           <a class="nav-icon logout-icon" (click)="showLogoutConfirmation()">

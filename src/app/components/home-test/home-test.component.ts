@@ -838,9 +838,8 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
       message += `• "siguiente" - Página siguiente\n`;
     }
     if (this.totalPages > 1) {
-      message += `• "página X" - Ir a página específica\n`;
+      message += `• "pagina X" o "página X" - Ir a página específica (ej: pagina 2)\n`;
     }
-    message += `• "PKY###" - Ver detalles de una vaca\n`;
     message += `• "salir" - Volver al menú principal`;
 
     return message;
@@ -861,14 +860,18 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
       this.currentPage--;
       this.showCurrentPage();
       return; // Exit early
-    } else if (input.startsWith('página ')) {
-      const pageNum = parseInt(input.replace('página ', ''));
-      if (pageNum >= 1 && pageNum <= this.totalPages) {
-        this.currentPage = pageNum;
-        this.showCurrentPage();
-        return; // Exit early
-      } else {
-        botResponse = `❌ Página no válida. Por favor ingresa un número entre 1 y ${this.totalPages}.`;
+    } else if (input.match(/^(página|pagina)\s+\d+$/i)) {
+      // Extraer el número de la página usando regex más flexible
+      const match = input.match(/\d+/);
+      if (match) {
+        const pageNum = parseInt(match[0]);
+        if (pageNum >= 1 && pageNum <= this.totalPages) {
+          this.currentPage = pageNum;
+          this.showCurrentPage();
+          return; // Exit early
+        } else {
+          botResponse = `❌ Página no válida. Por favor ingresa un número entre 1 y ${this.totalPages}.`;
+        }
       }
     } else if (input.startsWith('pky') && input.length >= 6) {
       // User selected a specific cow
@@ -889,7 +892,7 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
         this.showBotMenu = true;
       }, 1000);
     } else {
-      botResponse = `❌ Comando no reconocido. Usa:\n• "siguiente" / "anterior"\n• "página X"\n• PKY de la vaca (ej: PKY001)\n• "salir"`;
+      botResponse = `❌ Comando no reconocido: "${input}"\n\n📝 Comandos disponibles:\n• "siguiente" / "anterior"\n• "pagina 2" o "página 2" (ir a página específica)\n• PKY de la vaca (ej: PKY001)\n• "salir"`;
     }
     
     if (botResponse) {

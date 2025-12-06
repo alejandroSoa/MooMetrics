@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AuthService, RegisterRequest } from '../../services/auth.service';
 import { faEye, faEyeSlash, faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { RecaptchaModule, RecaptchaFormsModule } from 'ng-recaptcha';
 
 import { 
   IonHeader, 
@@ -25,6 +26,8 @@ import {
     CommonModule, 
     FormsModule, 
     FontAwesomeModule,
+    RecaptchaModule,
+    RecaptchaFormsModule,
     IonContent, 
     IonItem, 
     IonLabel, 
@@ -52,19 +55,37 @@ export class RegisterComponent {
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
   isLoading: boolean = false;
+  errorMessage: string = '';
+  
+  // reCAPTCHA
+  siteKey: string = '6LeNzSIsAAAAANjP4ywamhPNAu-BaNC9xOjlPUv9';
+  recaptchaToken: string | null = null;
 
   constructor(private router: Router, private authService: AuthService) {}
 
+  onRecaptchaResolved(token: string | null) {
+    this.recaptchaToken = token;
+    console.log('reCAPTCHA token:', token);
+  }
+
   onRegister() {
     if (this.formData.password !== this.formData.confirmPassword) {
+      this.errorMessage = 'Las contraseñas no coinciden';
+      return;
+    }
+
+    if (!this.recaptchaToken) {
+      this.errorMessage = 'Por favor completa el reCAPTCHA';
       return;
     }
 
     if (!this.isFormValid()) {
+      this.errorMessage = 'Por favor completa todos los campos';
       return;
     }
 
     this.isLoading = true;
+    this.errorMessage = '';
 
     // Prepare the body for the API request
     const requestBody: RegisterRequest = {
@@ -84,7 +105,14 @@ export class RegisterComponent {
         },
         error: (error) => {
           this.isLoading = false;
-          // Here you can add user-friendly error handling
+          // Extract error message from response
+          if (error.error?.message) {
+            this.errorMessage = error.error.message;
+          } else {
+            this.errorMessage = 'Error al crear la cuenta. Intenta nuevamente.';
+          }
+          // Reset recaptcha token on error to allow retry
+          this.recaptchaToken = null;
         }
       });
   }
@@ -95,6 +123,10 @@ export class RegisterComponent {
 
   toggleConfirmPasswordVisibility() {
     this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
+  onInputChange() {
+    this.errorMessage = ''; // Clear error when user types
   }
 
   navigateToLogin() {

@@ -22,6 +22,7 @@
               [(ngModel)]="formData.firstName" 
               name="firstName"
               placeholder="Tu nombre"
+              (ionInput)="onInputChange()"
               required>
             </ion-input>
           </ion-item>
@@ -33,6 +34,7 @@
               [(ngModel)]="formData.lastName" 
               name="lastName"
               placeholder="Tu apellido"
+              (ionInput)="onInputChange()"
               required>
             </ion-input>
           </ion-item>
@@ -46,6 +48,7 @@
             [(ngModel)]="formData.email" 
             name="email"
             placeholder="tu@email.com"
+            (ionInput)="onInputChange()"
             required>
           </ion-input>
         </ion-item>
@@ -58,6 +61,7 @@
             [(ngModel)]="formData.password" 
             name="password"
             placeholder="Mínimo 8 caracteres"
+            (ionInput)="onInputChange()"
             required>
           </ion-input>
           <ion-button 
@@ -77,6 +81,7 @@
             [(ngModel)]="formData.confirmPassword" 
             name="confirmPassword"
             placeholder="Repite tu contraseña"
+            (ionInput)="onInputChange()"
             required>
           </ion-input>
           <ion-button 
@@ -96,12 +101,25 @@
           </div>
         </div>
 
+        <!-- reCAPTCHA -->
+        <div class="recaptcha-container">
+          <re-captcha
+            [siteKey]="siteKey"
+            (resolved)="onRecaptchaResolved($event)">
+          </re-captcha>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
         <!-- Register Button -->
         <ion-button 
           expand="block" 
           class="auth-button register-button" 
           type="submit"
-          [disabled]="!isFormValid() || isLoading">
+          [disabled]="!isFormValid() || isLoading || !recaptchaToken">
           {{ isLoading ? 'Creando cuenta...' : 'Crear Cuenta' }}
         </ion-button>
 

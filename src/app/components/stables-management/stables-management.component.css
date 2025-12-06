@@ -1,6 +1,6 @@
 .stables-container {
   padding: 20px;
-  padding-bottom: 200px; /* Extra margin at the bottom for better scrolling */
+  padding-bottom: 80px; /* Extra margin at the bottom for better scrolling */
   height: 100%;
   background-color: #ffffff;
 }
@@ -157,6 +157,7 @@ ion-buttons ion-button:hover fa-icon {
 ion-list {
   background: transparent;
   padding: 0;
+  padding-bottom: 250px; /* Extra space at the bottom of the list */
 }
 
 ion-card-content {

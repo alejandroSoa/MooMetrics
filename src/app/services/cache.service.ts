@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, from } from 'rxjs';
-import { map, tap, catchError } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, from, throwError } from 'rxjs';
+import { map, tap, catchError, timeout } from 'rxjs/operators';
 import { StablesResponse } from './stable.service';
 import { ChannelsResponse } from './channel.service';
 import { MessagesResponse } from './message.service';
@@ -333,14 +333,20 @@ export class CacheService {
   ): Observable<T> {
     console.log(`🌐 Fetching from network (network-first): ${key}`);
     return networkCall().pipe(
-      tap(data => this.set(key, data, cacheDuration)),
+      timeout(10000), // 10 second timeout
+      tap(data => {
+        console.log(`✅ Network success: ${key}`);
+        this.set(key, data, cacheDuration);
+      }),
       catchError(error => {
+        console.log(`❌ Network error for ${key}:`, error.message || error);
         const cached = this.get<T>(key);
         if (cached) {
           console.log(`📁 Fallback to cache: ${key}`);
           return of(cached);
         }
-        throw error;
+        console.log(`⚠️ No cache available for ${key}, throwing error`);
+        return throwError(() => new Error(`No se pudieron cargar los datos y no hay cache disponible`));
       })
     );
   }

@@ -19,7 +19,8 @@ import {
   IonBadge,
   IonButtons,
   IonButton,
-  IonIcon
+  IonIcon,
+  ViewWillEnter
 } from '@ionic/angular/standalone';
 import { StableService, Stable, StablesResponse } from '../../services/stable.service';
 import { ChannelService, Channel, ChannelsResponse } from '../../services/channel.service';
@@ -47,7 +48,7 @@ import { ChannelService, Channel, ChannelsResponse } from '../../services/channe
   templateUrl: './stables-management.component.html',
   styleUrls: ['./stables-management.component.css']
 })
-export class StablesManagementComponent implements OnInit {
+export class StablesManagementComponent implements OnInit, ViewWillEnter {
   // FontAwesome icons
   faPlus = faPlus;
   faSignal = faSignal;
@@ -71,6 +72,12 @@ export class StablesManagementComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Initial load is handled by ionViewWillEnter
+  }
+
+  ionViewWillEnter() {
+    // This lifecycle hook is called every time the view is entered
+    // This ensures the list is refreshed when returning from stable-detail
     this.loadStables();
   }
 

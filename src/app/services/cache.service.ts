@@ -20,6 +20,10 @@ export interface CacheIndex {
   cowDetails: { [cowId: string]: number };
   inventory: { [stableId: string]: number };
   events: { [stableId: string]: number };
+  roles: number;
+  roleDetails: { [roleId: string]: number };
+  users: number;
+  userDetails: { [userId: string]: number };
 }
 
 @Injectable({
@@ -167,6 +171,10 @@ export class CacheService {
       // Update timestamp for the key
       if (key === 'stables') {
         index.stables = Date.now();
+      } else if (key === 'roles') {
+        index.roles = Date.now();
+      } else if (key === 'users') {
+        index.users = Date.now();
       } else if (key.startsWith('channels_')) {
         const stableId = key.replace('channels_', '');
         index.channels[stableId] = Date.now();
@@ -190,6 +198,12 @@ export class CacheService {
       } else if (key.startsWith('events_')) {
         const stableId = key.replace('events_', '');
         index.events[stableId] = Date.now();
+      } else if (key.startsWith('role_')) {
+        const roleId = key.replace('role_', '');
+        index.roleDetails[roleId] = Date.now();
+      } else if (key.startsWith('user_')) {
+        const userId = key.replace('user_', '');
+        index.userDetails[userId] = Date.now();
       }
       
       localStorage.setItem(this.INDEX_KEY, JSON.stringify(index));
@@ -207,6 +221,10 @@ export class CacheService {
       
       if (key === 'stables') {
         index.stables = 0;
+      } else if (key === 'roles') {
+        index.roles = 0;
+      } else if (key === 'users') {
+        index.users = 0;
       } else if (key.startsWith('channels_')) {
         const stableId = key.replace('channels_', '');
         delete index.channels[stableId];
@@ -229,6 +247,12 @@ export class CacheService {
       } else if (key.startsWith('events_')) {
         const stableId = key.replace('events_', '');
         delete index.events[stableId];
+      } else if (key.startsWith('role_')) {
+        const roleId = key.replace('role_', '');
+        delete index.roleDetails[roleId];
+      } else if (key.startsWith('user_')) {
+        const userId = key.replace('user_', '');
+        delete index.userDetails[userId];
       }
       
       localStorage.setItem(this.INDEX_KEY, JSON.stringify(index));
@@ -258,7 +282,11 @@ export class CacheService {
       cows: {},
       cowDetails: {},
       inventory: {},
-      events: {}
+      events: {},
+      roles: 0,
+      roleDetails: {},
+      users: 0,
+      userDetails: {}
     };
   }
 

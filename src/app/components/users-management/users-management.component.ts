@@ -13,7 +13,8 @@ import {
   IonCard,
   IonCardHeader,
   IonCardTitle,
-  IonCardContent 
+  IonCardContent,
+  ViewWillEnter
 } from '@ionic/angular/standalone';
 import { UserService, User, UsersResponse } from '../../services/user.service';
 
@@ -36,7 +37,7 @@ import { UserService, User, UsersResponse } from '../../services/user.service';
   templateUrl: './users-management.component.html',
   styleUrls: ['./users-management.component.css']
 })
-export class UsersManagementComponent implements OnInit {
+export class UsersManagementComponent implements OnInit, ViewWillEnter {
   users: User[] = [];
   isLoading = true;
   errorMessage = '';
@@ -44,6 +45,12 @@ export class UsersManagementComponent implements OnInit {
   constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit() {
+    // Initial load is handled by ionViewWillEnter
+  }
+
+  ionViewWillEnter() {
+    // This lifecycle hook is called every time the view is entered
+    // This ensures the list is refreshed when returning from user-detail
     this.loadUsers();
   }
 

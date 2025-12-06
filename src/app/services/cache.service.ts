@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, from, throwError } from 'rxjs';
-import { map, tap, catchError, timeout } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, from } from 'rxjs';
+import { map, tap, catchError } from 'rxjs/operators';
 import { StablesResponse } from './stable.service';
 import { ChannelsResponse } from './channel.service';
 import { MessagesResponse } from './message.service';
@@ -20,10 +20,6 @@ export interface CacheIndex {
   cowDetails: { [cowId: string]: number };
   inventory: { [stableId: string]: number };
   events: { [stableId: string]: number };
-  roles: number;
-  roleDetails: { [roleId: string]: number };
-  users: number;
-  userDetails: { [userId: string]: number };
 }
 
 @Injectable({
@@ -171,10 +167,6 @@ export class CacheService {
       // Update timestamp for the key
       if (key === 'stables') {
         index.stables = Date.now();
-      } else if (key === 'roles') {
-        index.roles = Date.now();
-      } else if (key === 'users') {
-        index.users = Date.now();
       } else if (key.startsWith('channels_')) {
         const stableId = key.replace('channels_', '');
         index.channels[stableId] = Date.now();
@@ -198,12 +190,6 @@ export class CacheService {
       } else if (key.startsWith('events_')) {
         const stableId = key.replace('events_', '');
         index.events[stableId] = Date.now();
-      } else if (key.startsWith('role_')) {
-        const roleId = key.replace('role_', '');
-        index.roleDetails[roleId] = Date.now();
-      } else if (key.startsWith('user_')) {
-        const userId = key.replace('user_', '');
-        index.userDetails[userId] = Date.now();
       }
       
       localStorage.setItem(this.INDEX_KEY, JSON.stringify(index));
@@ -221,10 +207,6 @@ export class CacheService {
       
       if (key === 'stables') {
         index.stables = 0;
-      } else if (key === 'roles') {
-        index.roles = 0;
-      } else if (key === 'users') {
-        index.users = 0;
       } else if (key.startsWith('channels_')) {
         const stableId = key.replace('channels_', '');
         delete index.channels[stableId];
@@ -247,12 +229,6 @@ export class CacheService {
       } else if (key.startsWith('events_')) {
         const stableId = key.replace('events_', '');
         delete index.events[stableId];
-      } else if (key.startsWith('role_')) {
-        const roleId = key.replace('role_', '');
-        delete index.roleDetails[roleId];
-      } else if (key.startsWith('user_')) {
-        const userId = key.replace('user_', '');
-        delete index.userDetails[userId];
       }
       
       localStorage.setItem(this.INDEX_KEY, JSON.stringify(index));
@@ -282,11 +258,7 @@ export class CacheService {
       cows: {},
       cowDetails: {},
       inventory: {},
-      events: {},
-      roles: 0,
-      roleDetails: {},
-      users: 0,
-      userDetails: {}
+      events: {}
     };
   }
 
@@ -333,20 +305,14 @@ export class CacheService {
   ): Observable<T> {
     console.log(`🌐 Fetching from network (network-first): ${key}`);
     return networkCall().pipe(
-      timeout(10000), // 10 second timeout
-      tap(data => {
-        console.log(`✅ Network success: ${key}`);
-        this.set(key, data, cacheDuration);
-      }),
+      tap(data => this.set(key, data, cacheDuration)),
       catchError(error => {
-        console.log(`❌ Network error for ${key}:`, error.message || error);
         const cached = this.get<T>(key);
         if (cached) {
           console.log(`📁 Fallback to cache: ${key}`);
           return of(cached);
         }
-        console.log(`⚠️ No cache available for ${key}, throwing error`);
-        return throwError(() => new Error(`No se pudieron cargar los datos y no hay cache disponible`));
+        throw error;
       })
     );
   }

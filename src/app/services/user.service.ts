@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
-import { CacheService } from './cache.service';
 import { environment } from '../../environments/environment';
 
 export interface User {
@@ -35,44 +34,23 @@ export interface UpdateUserRequest {
 })
 export class UserService {
   private readonly API_URL = environment.apiUrl;
-  private readonly CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
-  constructor(
-    private http: HttpClient, 
-    private authService: AuthService,
-    private cacheService: CacheService
-  ) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   /**
-   * Get all users from the API with cache support
+   * Get all users from the API
    */
   getUsers(): Observable<UsersResponse> {
-    const networkCall = () => {
-      const headers = this.getAuthHeaders();
-      return this.http.get<UsersResponse>(`${this.API_URL}/users`, { headers });
-    };
-    
-    return this.cacheService.networkFirst(
-      'users',
-      networkCall,
-      this.CACHE_DURATION
-    );
+    const headers = this.getAuthHeaders();
+    return this.http.get<UsersResponse>(`${this.API_URL}/users`, { headers });
   }
 
   /**
-   * Get a specific user by ID with cache support
+   * Get a specific user by ID
    */
   getUserById(id: number): Observable<UserResponse> {
-    const networkCall = () => {
-      const headers = this.getAuthHeaders();
-      return this.http.get<UserResponse>(`${this.API_URL}/users/${id}`, { headers });
-    };
-    
-    return this.cacheService.networkFirst(
-      `user_${id}`,
-      networkCall,
-      this.CACHE_DURATION
-    );
+    const headers = this.getAuthHeaders();
+    return this.http.get<UserResponse>(`${this.API_URL}/users/${id}`, { headers });
   }
 
   /**

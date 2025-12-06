@@ -17,8 +17,7 @@ import {
   IonBadge,
   IonButtons,
   IonButton,
-  IonIcon,
-  ViewWillEnter
+  IonIcon
 } from '@ionic/angular/standalone';
 import { RoleService, Role, RolesResponse } from '../../services/role.service';
 
@@ -42,7 +41,7 @@ import { RoleService, Role, RolesResponse } from '../../services/role.service';
   templateUrl: './roles-management.component.html',
   styleUrls: ['./roles-management.component.css']
 })
-export class RolesManagementComponent implements OnInit, ViewWillEnter {
+export class RolesManagementComponent implements OnInit {
   roles: Role[] = [];
   isLoading = true;
   errorMessage = '';
@@ -50,12 +49,6 @@ export class RolesManagementComponent implements OnInit, ViewWillEnter {
   constructor(private roleService: RoleService, private router: Router) {}
 
   ngOnInit() {
-    // Initial load is handled by ionViewWillEnter
-  }
-
-  ionViewWillEnter() {
-    // This lifecycle hook is called every time the view is entered
-    // This ensures the list is refreshed when returning from role-detail
     this.loadRoles();
   }
 

@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
-import { CacheService } from './cache.service';
 import { environment } from '../../environments/environment';
 
 export interface Role {
@@ -38,44 +37,23 @@ export interface CreateRoleRequest {
 })
 export class RoleService {
   private readonly API_URL = environment.apiUrl;
-  private readonly CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
-  constructor(
-    private http: HttpClient, 
-    private authService: AuthService,
-    private cacheService: CacheService
-  ) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   /**
-   * Get all roles from the API with cache support
+   * Get all roles from the API
    */
   getRoles(): Observable<RolesResponse> {
-    const networkCall = () => {
-      const headers = this.getAuthHeaders();
-      return this.http.get<RolesResponse>(`${this.API_URL}/roles`, { headers });
-    };
-    
-    return this.cacheService.networkFirst(
-      'roles',
-      networkCall,
-      this.CACHE_DURATION
-    );
+    const headers = this.getAuthHeaders();
+    return this.http.get<RolesResponse>(`${this.API_URL}/roles`, { headers });
   }
 
   /**
-   * Get a specific role by ID with cache support
+   * Get a specific role by ID
    */
   getRoleById(id: number): Observable<RoleResponse> {
-    const networkCall = () => {
-      const headers = this.getAuthHeaders();
-      return this.http.get<RoleResponse>(`${this.API_URL}/roles/${id}`, { headers });
-    };
-    
-    return this.cacheService.networkFirst(
-      `role_${id}`,
-      networkCall,
-      this.CACHE_DURATION
-    );
+    const headers = this.getAuthHeaders();
+    return this.http.get<RoleResponse>(`${this.API_URL}/roles/${id}`, { headers });
   }
 
   /**

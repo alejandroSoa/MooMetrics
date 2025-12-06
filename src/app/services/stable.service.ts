@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { CacheService } from './cache.service';
 import { environment } from '../../environments/environment';
@@ -80,18 +81,31 @@ export class StableService {
 
   /**
    * Update a stable
+   * Clears cache after update
    */
   updateStable(id: number, stableData: UpdateStableRequest): Observable<StableResponse> {
     const headers = this.getAuthHeaders();
-    return this.http.put<StableResponse>(`${this.API_URL}/stables/${id}`, stableData, { headers });
+    return this.http.put<StableResponse>(`${this.API_URL}/stables/${id}`, stableData, { headers }).pipe(
+      tap(() => {
+        // Clear stable cache to refresh data
+        this.cacheService.remove(`stable_${id}`);
+        this.cacheService.remove('stables');
+      })
+    );
   }
 
   /**
    * Create a new stable
+   * Clears cache after creation
    */
   createStable(stableData: CreateStableRequest): Observable<StableResponse> {
     const headers = this.getAuthHeaders();
-    return this.http.post<StableResponse>(`${this.API_URL}/stables`, stableData, { headers });
+    return this.http.post<StableResponse>(`${this.API_URL}/stables`, stableData, { headers }).pipe(
+      tap(() => {
+        // Clear stables cache to refresh list
+        this.cacheService.remove('stables');
+      })
+    );
   }
 
   /**

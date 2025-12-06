@@ -107,51 +107,9 @@ export class CowService {
   private readonly SHORT_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for dynamic data
 
   constructor(private cacheService: CacheService) {
-    this.initializeMockData();
+
   }
 
-  /**
-   * Initialize mock data for cows
-   */
-  private initializeMockData(): void {
-    const breeds = ['Holstein', 'Jersey', 'Angus', 'Simmental', 'Charolais'];
-    const ages = ['1 año', '2 años', '3 años', '4 años', '5 años', '6 años'];
-    const sexes = ['F', 'M'];
-    
-    // Generate 77 mock cows
-    for (let i = 1; i <= 77; i++) {
-      const randomBreed = breeds[Math.floor(Math.random() * breeds.length)];
-      const randomAge = ages[Math.floor(Math.random() * ages.length)];
-      const randomSex = i <= 62 ? 'F' : sexes[Math.floor(Math.random() * sexes.length)]; // More females
-      
-      this.mockCows.push({
-        id: `PKY${i.toString().padStart(3, '0')}`,
-        name: `Vaca ${i}`,
-        breed: randomBreed,
-        age: randomAge,
-        birthDate: this.generateRandomBirthDate(),
-        sex: randomSex,
-        barnName: `Corral ${Math.floor(Math.random() * 10) + 1}`,
-        stableId: 1, // Assuming current stable
-        lactationNumber: randomSex === 'F' ? Math.floor(Math.random() * 5) + 1 : undefined,
-        daysInMilk: randomSex === 'F' ? Math.floor(Math.random() * 300) + 1 : undefined,
-        dailyProduction: randomSex === 'F' ? Math.round((Math.random() * 20 + 15) * 10) / 10 : undefined,
-        lastEvent: {
-          type: 'Chequeo embarazo',
-          date: this.generateRandomRecentDate(),
-          technician: `Dr. ${['García', 'López', 'Martínez', 'Rodríguez', 'Hernández'][Math.floor(Math.random() * 5)]}`,
-          status: randomSex === 'F' ? 'Gestante - 45 días' : 'Sano'
-        },
-        events: {
-          diagnoses: Math.floor(Math.random() * 15) + 1,
-          pregnancyChecks: randomSex === 'F' ? Math.floor(Math.random() * 10) + 1 : 0,
-          breedings: randomSex === 'F' ? Math.floor(Math.random() * 5) + 1 : 0,
-          treatments: Math.floor(Math.random() * 5),
-          births: randomSex === 'F' ? Math.floor(Math.random() * 3) : 0
-        }
-      });
-    }
-  }
 
   /**
    * Get paginated list of cows for a specific stable with cache support

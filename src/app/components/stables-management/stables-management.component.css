@@ -1,5 +1,6 @@
 .stables-container {
   padding: 20px;
+  padding-bottom: 200px; /* Extra margin at the bottom for better scrolling */
   height: 100%;
   background-color: #ffffff;
 }

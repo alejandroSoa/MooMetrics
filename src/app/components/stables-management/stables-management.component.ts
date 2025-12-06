@@ -48,7 +48,7 @@ import { ChannelService, Channel, ChannelsResponse } from '../../services/channe
   templateUrl: './stables-management.component.html',
   styleUrls: ['./stables-management.component.css']
 })
-export class StablesManagementComponent implements OnInit, ViewWillEnter {
+export class StablesManagementComponent implements OnInit {
   // FontAwesome icons
   faPlus = faPlus;
   faSignal = faSignal;
@@ -72,10 +72,6 @@ export class StablesManagementComponent implements OnInit, ViewWillEnter {
   ) {}
 
   ngOnInit() {
-    // Initial load is handled by ionViewWillEnter
-  }
-
-  ionViewWillEnter() {
     // This lifecycle hook is called every time the view is entered
     // This ensures the list is refreshed when returning from stable-detail
     this.loadStables();

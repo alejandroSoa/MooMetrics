@@ -129,6 +129,13 @@
   text-transform: none;
 }
 
+/* reCAPTCHA Container */
+.recaptcha-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
 /* Auth Buttons */
 .auth-button {
   --border-radius: 12px;

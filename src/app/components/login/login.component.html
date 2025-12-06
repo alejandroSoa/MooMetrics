@@ -53,12 +53,20 @@
           </ion-button>
         </div>
 
+        <!-- reCAPTCHA -->
+        <div class="recaptcha-container">
+          <re-captcha
+            [siteKey]="siteKey"
+            (resolved)="onRecaptchaResolved($event)">
+          </re-captcha>
+        </div>
+
         <!-- Login Button -->
         <ion-button 
           expand="block" 
           class="auth-button login-button" 
           type="submit"
-          [disabled]="!isFormValid() || isLoading">
+          [disabled]="!isFormValid() || isLoading || !recaptchaToken">
           {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
         </ion-button>
 

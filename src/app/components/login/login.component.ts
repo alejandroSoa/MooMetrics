@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { BiometricAuthService } from '../../services/biometric-auth.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash, faFingerprint } from '@fortawesome/free-solid-svg-icons';
+import { RecaptchaModule, RecaptchaFormsModule } from 'ng-recaptcha';
 import { 
   IonHeader, 
   IonToolbar, 
@@ -25,6 +26,8 @@ import {
     CommonModule, 
     FormsModule, 
     FontAwesomeModule,
+    RecaptchaModule,
+    RecaptchaFormsModule,
     IonContent, 
     IonItem, 
     IonLabel, 
@@ -49,6 +52,10 @@ export class LoginComponent {
   hasBiometricCredentials: boolean = false;
   biometricError: boolean = false;
   errorMessage: string = '';
+  
+  // reCAPTCHA
+  siteKey: string = '6LeNzSIsAAAAANjP4ywamhPNAu-BaNC9xOjlPUv9';
+  recaptchaToken: string | null = null;
 
   constructor(
     private router: Router, 
@@ -58,9 +65,19 @@ export class LoginComponent {
     this.initializeBiometric();
   }
 
+  onRecaptchaResolved(token: string | null) {
+    this.recaptchaToken = token;
+    console.log('reCAPTCHA token:', token);
+  }
+
   onLogin() {
     if (!this.email || !this.password) {
       console.error('Email y contraseña son requeridos');
+      return;
+    }
+
+    if (!this.recaptchaToken) {
+      this.errorMessage = 'Por favor completa el reCAPTCHA';
       return;
     }
 
@@ -118,6 +135,10 @@ export class LoginComponent {
 
   onPasswordChange() {
     this.errorMessage = ''; // Clear error when user types
+  }
+
+  resetRecaptcha() {
+    this.recaptchaToken = null;
   }
 
   /**

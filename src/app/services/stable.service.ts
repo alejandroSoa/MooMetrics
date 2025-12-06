@@ -55,7 +55,7 @@ export class StableService {
       return this.http.get<StablesResponse>(`${this.API_URL}/stables`, { headers });
     };
     
-    return this.cacheService.cacheFirst(
+    return this.cacheService.networkFirst(
       'stables',
       networkCall,
       this.CACHE_DURATION
@@ -71,7 +71,7 @@ export class StableService {
       return this.http.get<StableResponse>(`${this.API_URL}/stables/${id}`, { headers });
     };
     
-    return this.cacheService.cacheFirst(
+    return this.cacheService.networkFirst(
       `stable_${id}`,
       networkCall,
       this.CACHE_DURATION

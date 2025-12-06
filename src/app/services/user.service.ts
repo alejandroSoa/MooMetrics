@@ -52,7 +52,7 @@ export class UserService {
       return this.http.get<UsersResponse>(`${this.API_URL}/users`, { headers });
     };
     
-    return this.cacheService.cacheFirst(
+    return this.cacheService.networkFirst(
       'users',
       networkCall,
       this.CACHE_DURATION
@@ -68,7 +68,7 @@ export class UserService {
       return this.http.get<UserResponse>(`${this.API_URL}/users/${id}`, { headers });
     };
     
-    return this.cacheService.cacheFirst(
+    return this.cacheService.networkFirst(
       `user_${id}`,
       networkCall,
       this.CACHE_DURATION

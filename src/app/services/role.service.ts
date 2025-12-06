@@ -55,7 +55,7 @@ export class RoleService {
       return this.http.get<RolesResponse>(`${this.API_URL}/roles`, { headers });
     };
     
-    return this.cacheService.cacheFirst(
+    return this.cacheService.networkFirst(
       'roles',
       networkCall,
       this.CACHE_DURATION
@@ -71,7 +71,7 @@ export class RoleService {
       return this.http.get<RoleResponse>(`${this.API_URL}/roles/${id}`, { headers });
     };
     
-    return this.cacheService.cacheFirst(
+    return this.cacheService.networkFirst(
       `role_${id}`,
       networkCall,
       this.CACHE_DURATION

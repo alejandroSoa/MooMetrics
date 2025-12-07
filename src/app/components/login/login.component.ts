@@ -221,7 +221,19 @@ export class LoginComponent {
             next: (response) => {
               console.log('Automatic login successful:', response);
               if (response.status === 'success') {
-                this.router.navigate(['/home']);
+                // Verificar si se requiere OTP (mismo flujo que login normal)
+                if (response.data.otpSent && response.data.userId) {
+                  console.log('OTP required for biometric login');
+                  // Guardar datos temporalmente en sessionStorage
+                  sessionStorage.setItem('otp_user_id', response.data.userId.toString());
+                  sessionStorage.setItem('otp_temp_token', response.data.token);
+                  
+                  // Redirigir a la pantalla de verificación OTP
+                  this.router.navigate(['/otp-verification']);
+                } else {
+                  // No requiere OTP, ir directo a home
+                  this.router.navigate(['/home']);
+                }
               } else {
                 console.error('Automatic login failed, removing saved credentials');
                 this.removeSavedUserCredentials();

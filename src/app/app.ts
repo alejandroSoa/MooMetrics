@@ -82,7 +82,7 @@ export class App implements OnInit {
 
   isAuthPage(): boolean {
     const current = this.currentUrl();
-    return current === '/login' || current === '/register';
+    return current === '/login' || current === '/register' || current === '/otp-verification';
   }
 
   toggleAdminMode(): void {

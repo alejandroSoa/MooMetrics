@@ -217,23 +217,16 @@ export class LoginComponent {
           console.log('Using saved credentials for automatic login');
           
           // Hacer login automático con credenciales guardadas
-          this.authService.login(savedCredentials).subscribe({
+          // Agregar skipOtp: true para omitir validación OTP en login biométrico
+          const biometricCredentials = { ...savedCredentials, skipOtp: true };
+          
+          this.authService.login(biometricCredentials).subscribe({
             next: (response) => {
-              console.log('Automatic login successful:', response);
+              console.log('Automatic biometric login successful:', response);
               if (response.status === 'success') {
-                // Verificar si se requiere OTP (mismo flujo que login normal)
-                if (response.data.otpSent && response.data.userId) {
-                  console.log('OTP required for biometric login');
-                  // Guardar datos temporalmente en sessionStorage
-                  sessionStorage.setItem('otp_user_id', response.data.userId.toString());
-                  sessionStorage.setItem('otp_temp_token', response.data.token);
-                  
-                  // Redirigir a la pantalla de verificación OTP
-                  this.router.navigate(['/otp-verification']);
-                } else {
-                  // No requiere OTP, ir directo a home
-                  this.router.navigate(['/home']);
-                }
+                // Login biométrico siempre es directo, sin OTP
+                console.log('Biometric login bypassing OTP, going to home');
+                this.router.navigate(['/home']);
               } else {
                 console.error('Automatic login failed, removing saved credentials');
                 this.removeSavedUserCredentials();

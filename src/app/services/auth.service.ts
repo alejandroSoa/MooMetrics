@@ -8,6 +8,7 @@ export interface LoginRequest {
   email: string;
   password: string;
   fcmToken?: string;
+  skipOtp?: boolean;
 }
 
 export interface LoginResponse {
@@ -89,13 +90,15 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, payload)
       .pipe(
         map(response => {
-          // Solo guardar el token si NO se requiere OTP
-          // Si otpSent === true, el token es temporal y no debe guardarse aún
-          if (response.status === 'success' && response.data.token && !response.data.otpSent) {
-            // Store token in localStorage
-            localStorage.setItem(this.TOKEN_KEY, response.data.token);
-            // Update authentication state
-            this.isAuthenticatedSubject.next(true);
+          // Si es login biométrico (skipOtp=true), guardar token directamente ignorando OTP
+          // Si NO es biométrico, solo guardar si NO requiere OTP
+          if (response.status === 'success' && response.data.token) {
+            if (credentials.skipOtp || !response.data.otpSent) {
+              // Store token in localStorage
+              localStorage.setItem(this.TOKEN_KEY, response.data.token);
+              // Update authentication state
+              this.isAuthenticatedSubject.next(true);
+            }
           }
           return response;
         })

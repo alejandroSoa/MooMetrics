@@ -4,6 +4,7 @@ import { HomeTestComponent } from './components/home-test/home-test.component';
 import { NotificationComponent } from './components/notification/notification.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
+import { OtpVerificationComponent } from './components/otp-verification/otp-verification.component';
 import { AdminViewComponent } from './components/admin-view/admin-view.component';
 import { UsersManagementComponent } from './components/users-management/users-management.component';
 import { RolesManagementComponent } from './components/roles-management/roles-management.component';
@@ -28,6 +29,10 @@ export const routes: Routes = [
   { 
     path: 'register', 
     component: RegisterComponent
+  },
+  { 
+    path: 'otp-verification', 
+    component: OtpVerificationComponent
   },
   { 
     path: 'home', 

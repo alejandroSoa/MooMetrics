@@ -16,7 +16,27 @@ export interface LoginResponse {
   data: {
     type: string;
     token: string;
+    otpSent?: boolean;
+    userId?: number;
   };
+}
+
+export interface OtpVerifyRequest {
+  userId: number;
+  otpCode: string;
+}
+
+export interface OtpVerifyResponse {
+  status: string;
+  message: string;
+  data?: {
+    token?: string;
+  };
+}
+
+export interface OtpResendResponse {
+  status: string;
+  message: string;
 }
 
 export interface RegisterRequest {
@@ -69,7 +89,9 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, payload)
       .pipe(
         map(response => {
-          if (response.status === 'success' && response.data.token) {
+          // Solo guardar el token si NO se requiere OTP
+          // Si otpSent === true, el token es temporal y no debe guardarse aún
+          if (response.status === 'success' && response.data.token && !response.data.otpSent) {
             // Store token in localStorage
             localStorage.setItem(this.TOKEN_KEY, response.data.token);
             // Update authentication state
@@ -93,7 +115,8 @@ export class AuthService {
    */
   isAuthenticated(): boolean {
     const token = this.getToken();
-    return !!token && (token.startsWith('biometric_token_') || this.hasToken());
+    // Usuario está autenticado si tiene cualquier tipo de token (normal o biométrico)
+    return !!token;
   }
 
   /**
@@ -108,5 +131,33 @@ export class AuthService {
    */
   register(userData: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(`${this.API_URL}/auth/register`, userData);
+  }
+
+  /**
+   * Verify OTP code
+   */
+  verifyOtp(userId: number, otpCode: string, tempToken: string): Observable<OtpVerifyResponse> {
+    return this.http.post<OtpVerifyResponse>(`${this.API_URL}/auth/verify-otp`, {
+      userId,
+      otpCode
+    }).pipe(
+      map(response => {
+        // Si la verificación es exitosa, guardar el token temporal como token definitivo
+        if (response.status === 'success') {
+          localStorage.setItem(this.TOKEN_KEY, tempToken);
+          this.isAuthenticatedSubject.next(true);
+        }
+        return response;
+      })
+    );
+  }
+
+  /**
+   * Resend OTP code
+   */
+  resendOtp(userId: number): Observable<OtpResendResponse> {
+    return this.http.post<OtpResendResponse>(`${this.API_URL}/auth/resend-otp`, {
+      userId
+    });
   }
 }

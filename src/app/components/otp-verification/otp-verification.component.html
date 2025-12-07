@@ -1,0 +1,61 @@
+<ion-content [fullscreen]="true" [scrollY]="true" class="ion-padding">
+  <div class="auth-container">
+    <div class="auth-card">
+      <!-- Back Button -->
+      <button class="back-button" (click)="onBackToLogin()">
+        <fa-icon [icon]="faArrowLeft"></fa-icon>
+        <span>Volver</span>
+      </button>
+
+      <!-- Logo Section -->
+      <div class="auth-logo">
+        <div class="otp-icon">
+          <fa-icon [icon]="faShieldAlt"></fa-icon>
+        </div>
+        <h1>Verificación OTP</h1>
+        <p>Ingresa el código de 6 dígitos que enviamos a tu correo electrónico</p>
+      </div>
+
+      <!-- OTP Form -->
+      <form class="auth-form" (ngSubmit)="onVerifyOtp()">
+        <!-- OTP Input -->
+        <ion-item class="auth-input otp-input">
+          <ion-label position="stacked">
+            <fa-icon [icon]="faEnvelope"></fa-icon>
+            Código de Verificación
+          </ion-label>
+          <ion-input 
+            type="text" 
+            inputmode="numeric"
+            maxlength="6"
+            [(ngModel)]="otpCode" 
+            name="otpCode"
+            placeholder="000000"
+            (ionInput)="onOtpChange()"
+            (keypress)="onKeyPress($event)"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <!-- Success Message -->
+        <div *ngIf="successMessage" class="success-message">
+          <p>✓ {{ successMessage }}</p>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="error-message">
+          <p>{{ errorMessage }}</p>
+        </div>
+
+      </form>
+
+      <!-- Info Section -->
+      <div class="info-section">
+        <p>
+          <fa-icon [icon]="faShieldAlt"></fa-icon>
+          Este código es válido por 10 minutos
+        </p>
+      </div>
+    </div>
+  </div>
+</ion-content>

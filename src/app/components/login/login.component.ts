@@ -94,12 +94,26 @@ export class LoginComponent {
     this.authService.login(credentials).subscribe({
       next: (response) => {
         console.log('Login successful:', response);
+        console.log('OTP required?', response.data.otpSent);
+        console.log('User ID:', response.data.userId);
+        
         if (response.status === 'success') {
-          // Guardar credenciales para uso con huella digital
-          this.saveUserCredentials(this.email, this.password);
-          
-          // Navigate to home after successful login
-          this.router.navigate(['/home']);
+          // Verificar si se requiere OTP
+          if (response.data.otpSent && response.data.userId) {
+            console.log('Redirecting to OTP verification...');
+            // Guardar datos temporalmente en sessionStorage
+            sessionStorage.setItem('otp_user_id', response.data.userId.toString());
+            sessionStorage.setItem('otp_temp_token', response.data.token);
+            
+            // Redirigir a la pantalla de verificación OTP
+            this.router.navigate(['/otp-verification']);
+          } else {
+            // Guardar credenciales para uso con huella digital
+            this.saveUserCredentials(this.email, this.password);
+            
+            // Navigate to home after successful login
+            this.router.navigate(['/home']);
+          }
         }
         this.isLoading = false;
       },
@@ -126,7 +140,7 @@ export class LoginComponent {
   }
 
   isFormValid(): boolean {
-    return !!this.email?.trim() && !!this.password?.trim();
+    return !!this.email?.trim() && !!this.password?.trim() && !!this.recaptchaToken;
   }
 
   onEmailChange() {

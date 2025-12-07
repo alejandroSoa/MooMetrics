@@ -59,7 +59,7 @@
           expand="block" 
           class="auth-button login-button" 
           type="submit"
-          [disabled]="!isFormValid() || isLoading || !recaptchaToken">
+          [disabled]="!isFormValid() || isLoading">
           {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
         </ion-button>
 

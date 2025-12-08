@@ -15,6 +15,7 @@ import { StableDetailComponent } from './components/stable-detail/stable-detail.
 import { ChannelCreateComponent } from './components/channel-create/channel-create.component';
 import { ChannelDetailComponent } from './components/channel-detail/channel-detail.component';
 import { AuthGuard } from './guards/auth.guard';
+import { adminGuard, userGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { 
@@ -37,61 +38,61 @@ export const routes: Routes = [
   { 
     path: 'home', 
     component: HomeTestComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, userGuard]
   },
   { 
     path: 'notifications', 
     component: NotificationComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, userGuard]
   },
   { 
     path: 'sw-test', 
     component: SwTestComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, userGuard]
   },
   {
     path: 'admin',
     component: AdminViewComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, adminGuard]
   },
   {
     path: 'admin/users',
     component: UsersManagementComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, adminGuard]
   },
   {
     path: 'admin/users/:id',
     component: UserDetailComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, adminGuard]
   },
   {
     path: 'admin/roles',
     component: RolesManagementComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, adminGuard]
   },
   {
     path: 'admin/roles/:id',
     component: RoleDetailComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, adminGuard]
   },
   {
     path: 'admin/stables',
     component: StablesManagementComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, adminGuard]
   },
   {
     path: 'admin/stables/:id',
     component: StableDetailComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, adminGuard]
   },
   {
     path: 'admin/channels/:stableId',
     component: ChannelCreateComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, adminGuard]
   },
   {
     path: 'admin/channels/:id/detail',
     component: ChannelDetailComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, adminGuard]
   }
 ];

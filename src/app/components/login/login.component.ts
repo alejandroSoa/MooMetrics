@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { BiometricAuthService } from '../../services/biometric-auth.service';
+import { AdminModeService } from '../../services/admin-mode.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash, faFingerprint } from '@fortawesome/free-solid-svg-icons';
 import { RecaptchaModule, RecaptchaFormsModule } from 'ng-recaptcha';
@@ -60,7 +61,8 @@ export class LoginComponent {
   constructor(
     private router: Router, 
     private authService: AuthService,
-    private biometricService: BiometricAuthService
+    private biometricService: BiometricAuthService,
+    private adminModeService: AdminModeService
   ) {
     this.initializeBiometric();
   }
@@ -114,6 +116,12 @@ export class LoginComponent {
             // Detectar dispositivo y redirigir
             const isMobile = this.biometricService.isMobileDevice();
             const destination = isMobile ? '/home' : '/admin';
+            
+            // Si es PC, activar modo admin
+            if (!isMobile) {
+              this.adminModeService.setAdminMode(true);
+            }
+            
             this.router.navigate([destination]);
           }
         }

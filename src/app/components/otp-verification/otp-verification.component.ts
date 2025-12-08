@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { BiometricAuthService } from '../../services/biometric-auth.service';
+import { AdminModeService } from '../../services/admin-mode.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft, faEnvelope, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
 import { 
@@ -49,7 +50,8 @@ export class OtpVerificationComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private biometricService: BiometricAuthService
+    private biometricService: BiometricAuthService,
+    private adminModeService: AdminModeService
   ) {
     console.log('OTP Component Constructor');
   }
@@ -106,6 +108,11 @@ export class OtpVerificationComponent implements OnInit {
           // Detectar dispositivo y redirigir
           const isMobile = this.biometricService.isMobileDevice();
           const destination = isMobile ? '/home' : '/admin';
+          
+          // Si es PC, activar modo admin
+          if (!isMobile) {
+            this.adminModeService.setAdminMode(true);
+          }
           
           // El token ya se guarda automáticamente en el servicio
           // Redirigir después de 1 segundo

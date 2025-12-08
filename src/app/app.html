@@ -16,18 +16,7 @@
         </div>
       </div>
       
-      <!-- Admin Mode Toggle -->
-      <div class="admin-toggle">
-        <div class="admin-toggle-icon" (click)="toggleAdminMode()">
-          <fa-icon [icon]="faUserShield"></fa-icon>
-        </div>
-        <div class="toggle-switch" (click)="toggleAdminMode()">
-          <fa-icon [icon]="isAdminMode() ? faToggleOn : faToggleOff" 
-                   [ngClass]="{'toggle-on': isAdminMode(), 'toggle-off': !isAdminMode()}"></fa-icon>
-        </div>
-      </div>
-      
-      <!-- Navigation Icons - Normal Mode -->
+      <!-- Navigation Icons - Normal Mode (Móvil) -->
       <div class="nav-icons" *ngIf="!isAdminMode()">
         <div class="nav-icon-container">
           <div class="nav-active-indicator" *ngIf="isActive('/home')"></div>

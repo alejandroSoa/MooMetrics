@@ -111,8 +111,10 @@ export class LoginComponent {
             // Guardar credenciales para uso con huella digital
             this.saveUserCredentials(this.email, this.password);
             
-            // Navigate to home after successful login
-            this.router.navigate(['/home']);
+            // Detectar dispositivo y redirigir
+            const isMobile = this.biometricService.isMobileDevice();
+            const destination = isMobile ? '/home' : '/admin';
+            this.router.navigate([destination]);
           }
         }
         this.isLoading = false;

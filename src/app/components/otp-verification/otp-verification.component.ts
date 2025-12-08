@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { BiometricAuthService } from '../../services/biometric-auth.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft, faEnvelope, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
 import { 
@@ -47,7 +48,8 @@ export class OtpVerificationComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private biometricService: BiometricAuthService
   ) {
     console.log('OTP Component Constructor');
   }
@@ -101,10 +103,14 @@ export class OtpVerificationComponent implements OnInit {
           sessionStorage.removeItem('otp_user_id');
           sessionStorage.removeItem('otp_temp_token');
           
+          // Detectar dispositivo y redirigir
+          const isMobile = this.biometricService.isMobileDevice();
+          const destination = isMobile ? '/home' : '/admin';
+          
           // El token ya se guarda automáticamente en el servicio
-          // Redirigir al home después de 1 segundo
+          // Redirigir después de 1 segundo
           setTimeout(() => {
-            this.router.navigate(['/home']);
+            this.router.navigate([destination]);
           }, 1000);
         }
         this.isLoading = false;

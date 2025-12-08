@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -38,7 +38,7 @@ interface StableWithChannels extends Stable {
   templateUrl: './home-test.component.html',
   styleUrls: ['./home-test.component.css']
 })
-export class HomeTestComponent implements OnInit, AfterViewChecked {
+export class HomeTestComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('messagesContainer', { static: false }) private messagesContainer!: ElementRef;
   
   // Icons
@@ -107,6 +107,10 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
   selectedStableIndex: number = -1;
   selectedChannelIndex: number = -1;
   selectedChannel: ChannelWithMessages | null = null;
+  
+  // Long polling for messages
+  private messagePollingInterval: any = null;
+  private readonly POLLING_INTERVAL_MS = 2000; // 2 segundos
 
   constructor(
     private stableService: StableService,
@@ -120,6 +124,10 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     this.loadStables();
     this.checkMobileView();
     window.addEventListener('resize', () => this.checkMobileView());
+  }
+  
+  ngOnDestroy() {
+    this.stopMessagePolling();
   }
   
 
@@ -204,9 +212,13 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
   /**
    * Load messages for a specific channel
    */
-  loadMessages(channel: ChannelWithMessages) {
-    if (channel.messagesLoaded || channel.isLoadingMessages) {
+  loadMessages(channel: ChannelWithMessages, isPolling: boolean = false) {
+    if (!isPolling && (channel.messagesLoaded || channel.isLoadingMessages)) {
       return;
+    }
+
+    if (isPolling && channel.isLoadingMessages) {
+      return; // No hacer polling si ya hay una petición en curso
     }
 
     channel.isLoadingMessages = true;
@@ -245,6 +257,9 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
    * Select a channel and load its messages
    */
   selectChannel(stableIndex: number, channelIndex: number): void {
+    // Stop previous polling
+    this.stopMessagePolling();
+    
     // Deactivate all channels in all stables
     this.stables.forEach(stable => {
       stable.channels.forEach(channel => {
@@ -262,6 +277,9 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     
     // Load messages for the selected channel
     this.loadMessages(selectedChannel);
+    
+    // Start long polling for messages
+    this.startMessagePolling();
     
     // Show chat on mobile
     if (this.isMobileView) {
@@ -1226,6 +1244,31 @@ export class HomeTestComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  /**
+   * Start message polling for the selected channel
+   */
+  private startMessagePolling(): void {
+    if (this.messagePollingInterval) {
+      return; // Ya hay un polling activo
+    }
+    
+    this.messagePollingInterval = setInterval(() => {
+      if (this.selectedChannel) {
+        this.loadMessages(this.selectedChannel, true);
+      }
+    }, this.POLLING_INTERVAL_MS);
+  }
+  
+  /**
+   * Stop message polling
+   */
+  private stopMessagePolling(): void {
+    if (this.messagePollingInterval) {
+      clearInterval(this.messagePollingInterval);
+      this.messagePollingInterval = null;
+    }
+  }
+  
   /**
    * Copy cow name to clipboard
    */

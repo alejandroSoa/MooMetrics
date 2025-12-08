@@ -179,23 +179,35 @@ export class UserDetailComponent implements OnInit {
     const role = this.roles.find(r => r.id === roleId);
     if (!role) return 'role-default';
     
-    switch (role.name.toLowerCase()) {
-      case 'admin': return 'role-admin';
-      case 'dev': return 'role-dev';
-      case 'user': return 'role-user';
-      default: return 'role-default';
-    }
+    const normalizedName = role.name.toLowerCase();
+    const classMap: { [key: string]: string } = {
+      'admin': 'role-admin',
+      'dev': 'role-dev',
+      'user': 'role-user',
+      'moderador': 'role-moderator',
+      'moderator': 'role-moderator'
+    };
+    
+    return classMap[normalizedName] || 'role-default';
   }
 
   getRoleName(roleId: number): string {
     const role = this.roles.find(r => r.id === roleId);
     if (!role) return 'Desconocido';
+    return this.getRoleDisplayName(role.name);
+  }
+
+  getRoleDisplayName(roleName: string): string {
+    // Mapeo de nombres de rol a español
+    const roleNameMap: { [key: string]: string } = {
+      'admin': 'Administrador',
+      'dev': 'Desarrollador',
+      'user': 'Usuario',
+      'moderador': 'Moderador',
+      'moderator': 'Moderador'
+    };
     
-    switch (role.name.toLowerCase()) {
-      case 'admin': return 'Administrador';
-      case 'dev': return 'Desarrollador';
-      case 'user': return 'Usuario';
-      default: return role.name;
-    }
+    const normalizedName = roleName.toLowerCase();
+    return roleNameMap[normalizedName] || roleName;
   }
 }

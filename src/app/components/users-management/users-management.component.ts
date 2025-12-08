@@ -16,6 +16,7 @@ import {
   IonCardContent 
 } from '@ionic/angular/standalone';
 import { UserService, User, UsersResponse } from '../../services/user.service';
+import { RoleService, Role, RolesResponse } from '../../services/role.service';
 
 @Component({
   selector: 'app-users-management',
@@ -38,13 +39,19 @@ import { UserService, User, UsersResponse } from '../../services/user.service';
 })
 export class UsersManagementComponent implements OnInit {
   users: User[] = [];
+  roles: Role[] = [];
   isLoading = true;
   errorMessage = '';
 
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(
+    private userService: UserService,
+    private roleService: RoleService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadUsers();
+    this.loadRoles();
   }
 
   loadUsers() {
@@ -68,13 +75,34 @@ export class UsersManagementComponent implements OnInit {
     });
   }
 
+  loadRoles() {
+    this.roleService.getRoles().subscribe({
+      next: (response: RolesResponse) => {
+        if (response.status === 'success') {
+          this.roles = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading roles:', error);
+      }
+    });
+  }
+
   getRoleName(roleId: number): string {
-    switch (roleId) {
-      case 1: return 'Usuario';
-      case 2: return 'Moderador';
-      case 3: return 'Administrador';
-      default: return 'Desconocido';
-    }
+    const role = this.roles.find(r => r.id === roleId);
+    if (!role) return 'Desconocido';
+    
+    // Mapeo de nombres de rol a español
+    const roleNameMap: { [key: string]: string } = {
+      'admin': 'Administrador',
+      'dev': 'Desarrollador',
+      'user': 'Usuario',
+      'moderador': 'Moderador',
+      'moderator': 'Moderador'
+    };
+    
+    const normalizedName = role.name.toLowerCase();
+    return roleNameMap[normalizedName] || role.name;
   }
 
   viewUserDetail(userId: number): void {

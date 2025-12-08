@@ -77,7 +77,7 @@
                 <ion-select-option 
                   *ngFor="let role of roles" 
                   [value]="role.id">
-                  {{ getRoleName(role.id) }}
+                  {{ getRoleDisplayName(role.name) }}
                 </ion-select-option>
               </ion-select>
             </ion-item>

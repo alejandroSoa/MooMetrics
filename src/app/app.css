@@ -14,7 +14,7 @@
 
 /* Persistent Sidebar */
 .persistent-sidebar {
-  width: 60px;
+  width: 150px;
   min-width: 60px;
   background-color: #000;
   display: flex;
